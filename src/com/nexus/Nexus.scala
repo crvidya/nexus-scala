@@ -8,6 +8,7 @@ import com.nexus.network.WebServer
 import com.nexus.network.WebServerHandlerLoader
 import com.nexus.network.SslContextProvider
 import com.nexus.network.NetworkHandler
+import com.nexus.logging.NexusLog
 
 object Nexus {
 
@@ -18,6 +19,7 @@ object Nexus {
 	this.loaders.add(WebServer)
 	
 	def start{
+		NexusLog.info("Starting nexus-scala, version %s (build %d)".format(Version.version, Version.build))
 		this.loaders.foreach(l=>l.load)
 	}
 }

@@ -8,6 +8,7 @@ import io.netty.handler.codec.base64.Base64
 import java.io.FileInputStream
 import java.security.Security
 import com.nexus.traits.TLoader
+import com.nexus.logging.NexusLog
 
 object SslContextProvider extends TLoader {
 
@@ -43,8 +44,8 @@ object SslContextProvider extends TLoader {
 		}catch{
 			case e:Exception => 
 		}
-		if(this.valid) println("Found valid SSL certificate")
-		else println("No valid SSL certificate was found")
+		if(this.valid) NexusLog.info("Valid SSL certificate was found")
+		else NexusLog.info("No valid SSL certificate was found")
     }
     
 	def getContext = this.serverContext;

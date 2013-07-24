@@ -4,6 +4,7 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import com.nexus.traits.TLoader
+import com.nexus.logging.NexusLog
 
 object WebServer extends TLoader {
 	def load = new WebServer(9001).run
@@ -17,7 +18,9 @@ class WebServer(private final val port:Int) {
         try{
             val b = new ServerBootstrap()
             b.group(bossGroup, workerGroup).channel(classOf[NioServerSocketChannel]).childHandler(new WebServerPipeline)
-            b.bind(this.port).sync().channel().closeFuture().sync()
+            val chan = b.bind(this.port).sync().channel()
+            NexusLog.info("WebServer is running on port " + this.port)
+            chan.closeFuture().sync()
         }finally{
             bossGroup.shutdownGracefully()
             workerGroup.shutdownGracefully()
