@@ -22,7 +22,7 @@ import io.netty.channel.socket.SocketChannel
 class Pipeline extends ChannelInitializer[SocketChannel] {
 	override def initChannel(ch: SocketChannel) {
 		val pipeline = ch.pipeline()
-		pipeline.addLast(new PortUnificationHandler)
+		pipeline.addLast(new PortUnificationHandler(true, true))
 		/*if(SslContextProvider.isValid) {
 			val sslEngine = SslContextProvider.getContext.createSSLEngine()
 			sslEngine.setUseClientMode(false)

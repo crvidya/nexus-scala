@@ -21,14 +21,17 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import com.nexus.traits.TLoader
 import com.nexus.logging.NexusLog
+import java.net.BindException
 
 object WebServer extends TLoader {
-	def load = new WebServer(9001).run
+	def load = new WebServer(9001).start()
 }
 
-class WebServer(private final val port:Int) {
+class WebServer(private final val port:Int) extends Thread {
+	this.setName("WebServer")
 
-	def run{
+	override def run{
+		NexusLog.info("Starting WebServer")
 		val bossGroup = new NioEventLoopGroup()
     val workerGroup = new NioEventLoopGroup()
     try{
@@ -37,10 +40,11 @@ class WebServer(private final val port:Int) {
       val chan = b.bind(this.port).sync().channel()
       NexusLog.info("WebServer is running on port " + this.port)
       chan.closeFuture().sync()
+    }catch{
+	    case e: BindException => NexusLog.severe("WebServer was not able to start! Address is already in use!")
     }finally{
       bossGroup.shutdownGracefully()
       workerGroup.shutdownGracefully()
     }
-    println("webserver closed!")
 	}
 }
