@@ -109,6 +109,8 @@ object NexusLogEngine {
 		NexusLogEngine.NexusLogger = Logger.getLogger("Nexus")
 		val stdOutLogger = Logger.getLogger("STDOUT")
 		val stdErrLogger = Logger.getLogger("STDERR")
+		stdOutLogger.setParent(NexusLogEngine.NexusLogger)
+		stdErrLogger.setParent(NexusLogEngine.NexusLogger)
 		NexusLogEngine.NexusLogger.setLevel(Level.ALL)
 		NexusLogEngine.NexusLogger.setUseParentHandlers(false)
 		ConsoleLogThread.start()
