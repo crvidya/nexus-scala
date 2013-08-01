@@ -1,0 +1,28 @@
+nexus.log.level
+	The minimum log level the logger should log.
+	This overrides the configured level in the config file.
+
+nexus.log.nocolor
+	Disables all colors in the logger.
+
+nexus.webserver.htdocslocation
+	Defines the path where nexus should search for the htdocs.
+	Default is htdocs/
+
+nexus.version.development
+	Marks this instance as an development version
+
+nexus.debugClassLoading
+	Show debug messages from the classloader
+
+nexus.debugClassLoadingFiner
+	Show finer debug messages from the classloader
+
+nexus.debugClassLoadingSave
+	Save all the transformed classes
+
+nexus.configDir
+	The path of the config directory
+
+nexus.langDir
+	The path of the directory containing all the language files
