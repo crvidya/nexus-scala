@@ -14,9 +14,19 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.webserver.annotation;
 
-object Version {
-	final val version = "R0.1-SNAPSHOT"
-	final val build = 0
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Authenticated {
 }

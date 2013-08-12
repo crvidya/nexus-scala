@@ -14,9 +14,17 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.data.json
 
-object Version {
-	final val version = "R0.1-SNAPSHOT"
-	final val build = 0
+class JsonString(private final val string: String) extends JsonValue {
+  if(this.string == null) throw new NullPointerException("String can\'t be null")
+
+  private [json] def write(writer: JsonWriter) = writer.writeString(this.string)
+  override def isString = true
+  override def asString = this.string
+  override def hashCode = this.string.hashCode
+  override def equals(obj: Any) =
+    if(obj == null) false
+    else if(this.getClass.ne(obj.getClass)) false
+    else this.string == obj.asInstanceOf[JsonString].asString
 }

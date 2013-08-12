@@ -14,14 +14,14 @@
  * under the License
  */
 
-package com.nexus.network
+package com.nexus.webserver
 
-import com.nexus.traits.TLoader
-import com.nexus.network.handlers.WebServerHandlerHtml
-
-object WebServerHandlerLoader extends TLoader {
-
-	override def load{
-		NetworkHandler.addHandler("/", WebServerHandlerHtml);
-	}
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+trait TWebServerResponse {
+  def getResponseData: String
+  def getMimeType: String
 }

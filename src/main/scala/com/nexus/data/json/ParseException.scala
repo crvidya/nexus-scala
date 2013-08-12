@@ -14,9 +14,10 @@
  * under the License
  */
 
-package com.nexus.network
+package com.nexus.data.json
 
-trait TWebServerResponse {
-	def getResponseData:String
-	def getMimeType:String
+class ParseException(message: String, offset: Int, line: Int, column: Int) extends RuntimeException(message + " at " + line + ":" + column) {
+  def getOffset = offset
+  def getLine = line
+  def getColumn = column
 }
