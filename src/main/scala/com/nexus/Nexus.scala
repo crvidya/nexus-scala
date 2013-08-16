@@ -23,17 +23,33 @@ import scala.collection.JavaConversions._
 import com.nexus.logging.NexusLog
 import com.nexus.webserver.{WebServerHandlerRegistry, SslContextProvider}
 import com.nexus.webserver.netty.WebServer
+import java.io.File
+import com.nexus.data.config.ConfigFile
+import com.nexus.event.EventBus
+import com.nexus.event.events.ServerStartedEvent
 
 object Nexus {
 
+  private final val EVENT_BUS = new EventBus()
 	private final val loaders:JList[TLoader] = Lists.newArrayList()
-	
-	this.loaders.add(WebServerHandlerRegistry)
+  private final val CONFIG_DIR = new File("config")
+  private var config: ConfigFile = null
+
+  this.loaders.add(WebServerHandlerRegistry)
 	this.loaders.add(SslContextProvider)
 	this.loaders.add(WebServer)
 	
-	def start{
+	def start(){
 		NexusLog.info("Starting nexus-scala, version %s (build %d)".format(Version.version, Version.build))
+
+    if(!this.CONFIG_DIR.exists()) this.CONFIG_DIR.mkdirs()
+    this.config = new ConfigFile(new File(this.CONFIG_DIR, "Nexus.cfg")).setComment("Nexus main configuration file")
+
 		this.loaders.foreach(l=>l.load)
+
+    this.getEventBus.post(new ServerStartedEvent)
 	}
+
+  def getConfig = this.config
+  def getEventBus = this.EVENT_BUS
 }

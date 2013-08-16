@@ -14,6 +14,18 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.event
 
-object Start extends App {Nexus.start()}
+import com.nexus.util.SEnum
+
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+object EventResult extends SEnum {
+  type EventResult = Value;
+  val DENY = EnumValue("DENY");
+  val DEFAULT = EnumValue("DEFAULT");
+  val ALLOW = EnumValue("ALLOW");
+}

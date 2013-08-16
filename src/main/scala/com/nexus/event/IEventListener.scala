@@ -14,6 +14,13 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.event
 
-object Start extends App {Nexus.start()}
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+trait IEventListener {
+  def invoke(event: Event)
+}

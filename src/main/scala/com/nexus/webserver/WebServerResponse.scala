@@ -21,20 +21,26 @@ import com.nexus.Version
 import com.nexus.data.json.JsonObject
 import io.netty.buffer.Unpooled
 import io.netty.util.CharsetUtil
+import io.netty.channel.ChannelHandlerContext
 
 /**
  * TODO: Edit description
  *
  * @author jk-5
  */
-class WebServerResponse(private final val request: WebServerRequest) {
+class WebServerResponse(private final val request: WebServerRequest = null) {
 
-  private final val ctx = request.getContext
+  private var ctx = request.getContext
   private final val httpRequest = request.getHttpRequest
   private final val httpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NO_CONTENT)
   private var headersReadyToSend = false
   private var headersSent = false
   private var responseClosed = false
+
+  def this(c: ChannelHandlerContext){
+    this
+    this.ctx = c
+  }
 
   def setHeader(name: String, value: AnyRef) = this.httpResponse.headers().set(name, value)
   def sendHeaders(status: HttpResponseStatus){
@@ -47,11 +53,11 @@ class WebServerResponse(private final val request: WebServerRequest) {
     this.ctx.write(this.httpResponse)
     this.headersSent = true
   }
-  def ForceSendHeaders{
+  def forceSendHeaders{
     if(!this.headersReadyToSend) throw new IllegalStateException("WebServerStatus and headers are not set!")
     this.sendHeadersToSession
   }
-  def ForceSendHeaders(status:HttpResponseStatus){
+  def forceSendHeaders(status:HttpResponseStatus){
     if(!this.headersReadyToSend) this.sendHeaders(status)
     this.sendHeadersToSession
   }
@@ -61,17 +67,16 @@ class WebServerResponse(private final val request: WebServerRequest) {
     val data = p.getResponseData
     val length = data.length()
     if(length == 0){
-      this.setHeader("Content-Length", "0")
-      this.ForceSendHeaders(HttpResponseStatus.NO_CONTENT)
+      this.setHeader(HttpHeaders.Names.CONTENT_LENGTH, "0")
+      this.forceSendHeaders(HttpResponseStatus.NO_CONTENT)
       this.close
       return
     }
 
-    //this.setHeader(HttpHeaders.Names.CONTENT_LENGTH, length.toString)
-    this.setHeader(HttpHeaders.Names.CONTENT_TYPE, p.getMimeType)
+    this.setHeader(HttpHeaders.Names.CONTENT_TYPE, "%s; charset=UTF-8".format(p.getMimeType))
 
-    if(!this.headersSent) this.ForceSendHeaders
-    if(this.httpRequest.getMethod() == HttpMethod.HEAD) return
+    if(!this.headersSent) this.forceSendHeaders
+    if(this.httpRequest != null && this.httpRequest.getMethod() == HttpMethod.HEAD) return
     this.ctx.write(Unpooled.copiedBuffer(data, CharsetUtil.UTF_8))
   }
   def sendError(s:String){
@@ -85,10 +90,7 @@ class WebServerResponse(private final val request: WebServerRequest) {
     this.sendData(p)
   }*/
   def close{
-    //if(!HttpHeaders.isKeepAlive(this.httpRequest)){
-      this.ctx.flush()
-      this.ctx.close()
-    //}
+    this.ctx.flush().close()
     this.responseClosed = true
   }
   def isOpen:Boolean = !this.responseClosed

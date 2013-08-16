@@ -14,6 +14,16 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.util
 
-object Start extends App {Nexus.start()}
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+abstract class SEnum extends Enumeration {
+  class EnumValue(elementName:String) extends Val(nextId, elementName) {
+    def getName:String = elementName;
+  }
+  protected final def EnumValue(elementName:String):EnumValue = new EnumValue(elementName);
+}

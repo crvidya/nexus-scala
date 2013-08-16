@@ -22,6 +22,7 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import com.nexus.logging.NexusLog
 import java.net.BindException
+import com.nexus.Nexus
 
 /**
  * TODO: Enter description
@@ -29,7 +30,7 @@ import java.net.BindException
  * @author jk-5
  */
 object WebServer extends TLoader {
-	override def load = new WebServer(9001).start
+	override def load = new WebServer(Nexus.getConfig.getTag("webserver").getTag("port").setComment("Port to host webserver on").getIntValue(9001)).start
 }
 
 class WebServer(private final val port: Int) extends Thread {

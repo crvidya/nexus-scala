@@ -219,7 +219,10 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebSer
 
   private def updateHashIndex = for(i <- 0 until names.size) table.add(names.get(i), i)
 
-  def addError(desc: String) = this.add("error", desc)
+  def addError(desc: String): JsonObject = {
+    this.add("error", desc)
+    this
+  }
   def getResponseData: String = this.toString
   def getMimeType = "application/json"
 }

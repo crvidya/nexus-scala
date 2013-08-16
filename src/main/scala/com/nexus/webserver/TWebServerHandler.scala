@@ -18,8 +18,6 @@ package com.nexus.webserver
 
 import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext}
 import io.netty.handler.codec.http._
-import io.netty.buffer.Unpooled
-import io.netty.util.CharsetUtil
 import java.util._
 import java.text.SimpleDateFormat
 import com.nexus.util.Utils
@@ -47,9 +45,10 @@ trait TWebServerHandler {
   protected final val HTTP_CACHE_SECONDS = 60
 
   protected def sendError(ctx: ChannelHandlerContext, status: HttpResponseStatus){
-    val response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(status.toString + "\r\n", CharsetUtil.UTF_8))
-    response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8") //TODO: JSON!
-    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE)
+    val res = new WebServerResponse(ctx)
+    res.sendHeaders(status)
+    res.sendError(status.toString)
+    res.close
   }
   protected def sendRedirect(ctx: ChannelHandlerContext, destination: String){
     val response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND)

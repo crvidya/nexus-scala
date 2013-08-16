@@ -14,6 +14,14 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.event.events
 
-object Start extends App {Nexus.start()}
+import com.nexus.event.Event
+
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+class ServerEvent extends Event
+class ServerStartedEvent extends ServerEvent

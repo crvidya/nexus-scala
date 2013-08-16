@@ -70,7 +70,7 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
 
   private def sendHttpResponse(ctx: ChannelHandlerContext, req: FullHttpRequest, res: FullHttpResponse){
     if(res.getStatus.code() != 200){
-      val buf = Unpooled.copiedBuffer(res.getStatus.toString, CharsetUtil.UTF_8)
+      val buf = Unpooled.copiedBuffer(res.getStatus.toString, CharsetUtil.UTF_8) //TODO: json response
       res.content().writeBytes(buf)
       buf.release()
       HttpHeaders.setContentLength(res, res.content().readableBytes())

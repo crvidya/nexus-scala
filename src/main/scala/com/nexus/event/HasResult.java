@@ -14,6 +14,20 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.event;
 
-object Start extends App {Nexus.start()}
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * TODO: Edit description
+ *
+ * @author jk-5
+ */
+
+@Retention(value = RetentionPolicy.RUNTIME)
+@Target(value = ElementType.TYPE)
+public @interface HasResult {
+}
