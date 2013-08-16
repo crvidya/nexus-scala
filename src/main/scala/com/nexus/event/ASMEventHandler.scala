@@ -16,16 +16,13 @@
 
 package com.nexus.event
 
-import scala.tools.asm.Opcodes
-import scala.tools.asm.Type
 import com.google.common.collect.Maps
 import java.lang.reflect.Method
 import java.io.File
 import java.util
-import scala.tools.asm.ClassWriter
-import scala.tools.asm.MethodVisitor
-import scala.tools.asm.Opcodes._
 import java.io.FileOutputStream
+import org.objectweb.asm.Opcodes._
+import org.objectweb.asm.{MethodVisitor, ClassWriter, Opcodes, Type}
 
 /**
  * TODO: Edit description

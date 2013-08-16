@@ -18,7 +18,6 @@ package com.nexus.logging
 
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.IOException
 import java.io.PrintStream
 import java.util.logging.FileHandler
 import java.util.logging.Handler
@@ -74,7 +73,6 @@ object NexusLogEngine {
 	private class LoggingOutStream(log:Logger, level:Level) extends ByteArrayOutputStream {
 		private final val currentMessage:StringBuilder = new StringBuilder();
 		
-		@throws[IOException]
 		override def flush(){
 			var record:String = null;
 			this.synchronized{
