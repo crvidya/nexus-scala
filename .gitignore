@@ -1,4 +1,6 @@
 *.DS_Store
 bin
 nexus-scala.iml
+/.gradle
+/build
 /runtime/*
