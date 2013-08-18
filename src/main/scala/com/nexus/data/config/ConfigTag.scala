@@ -96,8 +96,7 @@ class ConfigTag(var parent: ConfigTagParent, var name: String) extends ConfigTag
       ConfigFile.writeLine(writer, "{", tabs)
       saveTagTree(writer, tabs + 1, this.qualifiedName)
       ConfigFile.writeLine(writer, "}", tabs)
-    }
-    else {
+    }else{
       saveTagTree(writer, tabs, bracequalifier)
     }
   }

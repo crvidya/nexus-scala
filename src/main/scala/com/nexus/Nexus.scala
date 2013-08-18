@@ -27,6 +27,7 @@ import java.io.File
 import com.nexus.data.config.ConfigFile
 import com.nexus.event.EventBus
 import com.nexus.event.events.ServerStartedEvent
+import com.nexus.time.ticks.Timer
 
 object Nexus {
 
@@ -45,6 +46,8 @@ object Nexus {
     if(!this.CONFIG_DIR.exists()) this.CONFIG_DIR.mkdirs()
     this.config = new ConfigFile(new File(this.CONFIG_DIR, "Nexus.cfg")).setComment("Nexus main configuration file")
 
+    Timer.startTimer()
+
 		this.loaders.foreach(l=>l.load)
 
     this.getEventBus.post(new ServerStartedEvent)
@@ -52,4 +55,5 @@ object Nexus {
 
   def getConfig = this.config
   def getEventBus = this.EVENT_BUS
+  def getTimer = Timer
 }
