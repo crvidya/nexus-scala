@@ -26,7 +26,7 @@ import java.util.logging.LogManager
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 import scala.util.Properties
-import scala.actors.threadpool.LinkedBlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 
 object NexusLogEngine {
 

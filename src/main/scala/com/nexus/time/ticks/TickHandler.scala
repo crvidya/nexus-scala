@@ -59,10 +59,12 @@ object TickHandler {
       var break = false
       while(!break){
         if(this.tickHandlers.size == 0 || !this.tickHandlers.peek.scheduledNow(tick)) break = true
-        val element = this.tickHandlers.poll()
-        element.update(tick)
-        this.tickHandlers.offer(element)
-        ticks.add(element.getTicker)
+        else{
+          val element = this.tickHandlers.poll()
+          element.update(tick)
+          this.tickHandlers.offer(element)
+          ticks.add(element.getTicker)
+        }
       }
     }
   }

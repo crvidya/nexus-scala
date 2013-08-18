@@ -42,6 +42,11 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
   def handleHttpRequest(ctx: ChannelHandlerContext, req: FullHttpRequest) =
     if(!req.getDecoderResult.isSuccess) this.sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST))
     else{
+      if(req.headers().contains(HttpHeaders.Names.AUTHORIZATION)){
+        val data = req.headers().get(HttpHeaders.Names.AUTHORIZATION)
+        println(data)
+      }
+
       this.handler = WebServerHandlerFactory.handleRequest(ctx, req)
       if(this.handler != null){
         if(this.handler.getClass.isAnnotationPresent(classOf[Authenticated])){

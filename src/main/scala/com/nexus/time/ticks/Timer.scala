@@ -34,7 +34,7 @@ import scala.collection.JavaConversions._
 object Timer extends Thread {
   private final val ticksPerSecond = 10
   private final val secondLength = 1000
-  private final val tickDelay:Float = this.secondLength / this.ticksPerSecond
+  private final val tickDelay = (this.secondLength / this.ticksPerSecond).toFloat
   private var ticksSinceLastWarning = 0L
   private final val decimalFormat = new DecimalFormat()
 
@@ -65,13 +65,13 @@ object Timer extends Thread {
   override def run(){
     while(this.running){
       try{
-        this.Tick()
+        this.tick()
         Thread.sleep(this.tickDelay.toLong)
-      }catch{case e: Exception => {}}
+      }catch{case e: Exception =>}
     }
   }
 
-  private def Tick(){
+  private def tick(){
     this.rescheduleTicks()
     this.ticksSinceLastWarning += 1
     val stopwatch = new Stopwatch()
