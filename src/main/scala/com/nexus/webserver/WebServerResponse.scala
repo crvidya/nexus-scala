@@ -46,7 +46,8 @@ class WebServerResponse(private final val request: WebServerRequest = null) {
   def sendHeaders(status: HttpResponseStatus){
     this.httpResponse.setStatus(status)
     this.httpResponse.setProtocolVersion(request.getHttpVersion)
-    this.setHeader("Server", "nexus-scala/%s.%d".format(Version.version, Version.build))
+    this.setHeader(HttpHeaders.Names.SERVER, "nexus-scala/%s.%d".format(Version.version, Version.build))
+    if(SslContextProvider.isValid) this.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"Nexus\"")
     this.headersReadyToSend = true
   }
   private def sendHeadersToSession = try {

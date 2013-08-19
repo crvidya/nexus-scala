@@ -17,7 +17,7 @@
 package com.nexus.webserver.handlers
 
 import com.nexus.webserver.{WebServerResponse, WebServerRequest, TWebServerHandler}
-import io.netty.handler.codec.http.HttpResponseStatus
+import io.netty.handler.codec.http.{HttpHeaders, HttpResponseStatus}
 import com.nexus.data.json.{JsonArray, JsonObject}
 
 /**
@@ -42,8 +42,9 @@ class WebServerHandlerTest extends TWebServerHandler {
     obj.add("list", list)
     obj.add("test", "abcd")
 
-    response.sendHeaders(HttpResponseStatus.OK)
-    response.sendData(obj)
+    response.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"Nexus\"")
+    response.forceSendHeaders(HttpResponseStatus.UNAUTHORIZED)
+    //response.sendData(obj)
     response.close
   }
 }

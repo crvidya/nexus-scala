@@ -25,6 +25,7 @@ import com.nexus.webserver.annotation.Authenticated
 import com.nexus.webserver.handlers.WebServerHandlerWebsocket
 import io.netty.handler.ssl.NotSslRecordException
 import com.nexus.webserver.{WebServerHandlerFactory, TWebServerHandler}
+import io.netty.handler.codec.base64.Base64
 
 /**
  * TODO: Edit description
@@ -42,10 +43,10 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
   def handleHttpRequest(ctx: ChannelHandlerContext, req: FullHttpRequest) =
     if(!req.getDecoderResult.isSuccess) this.sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST))
     else{
-      println(req.headers().get(HttpHeaders.Names.AUTHORIZATION))
       if(req.headers().contains(HttpHeaders.Names.AUTHORIZATION)){
-        val data = req.headers().get(HttpHeaders.Names.AUTHORIZATION)
-        println(data)
+        val data = req.headers().get(HttpHeaders.Names.AUTHORIZATION).substring(6)
+        val decoded = Base64.decode(Unpooled.copiedBuffer(data, CharsetUtil.UTF_8)).toString(CharsetUtil.UTF_8)
+        //TODO: use this login stuff
       }
 
       this.handler = WebServerHandlerFactory.handleRequest(ctx, req)
