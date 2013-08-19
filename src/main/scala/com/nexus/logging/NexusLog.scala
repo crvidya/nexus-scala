@@ -20,19 +20,19 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 object NexusLog {
-	def log(channel:String, level:Level, format:String, data:Any*) = NexusLogEngine.log(channel, level, format, data);
-	def log(level:Level, format:String, data:Any*) = NexusLogEngine.log(level, format, data);
-	def log(channel:String, level:Level, ex:Throwable, format:String, data:Any*) = NexusLogEngine.log(channel, level, ex, format, data);
-	def log(level:Level, ex:Throwable, format:String, data:Any*) = NexusLogEngine.log(level, ex, format, data);
-	def severe(format:String, data:Any*) = NexusLogEngine.log(Level.SEVERE, format, data);
-	def warning(format:String, data:Any*) = NexusLogEngine.log(Level.WARNING, format, data);
-	def info(format:String, data:Any*) = NexusLogEngine.log(Level.INFO, format, data);
-	def fine(format:String, data:Any*) = NexusLogEngine.log(Level.FINE, format, data);
-	def finer(format:String, data:Any*) = NexusLogEngine.log(Level.FINER, format, data);
-	def finest(format:String, data:Any*) = NexusLogEngine.log(Level.FINEST, format, data);
-	def off(format:String, data:Any*) = NexusLogEngine.log(Level.OFF, format, data);
-	def all(format:String, data:Any*) = NexusLogEngine.log(Level.ALL, format, data);
-	def getLogger:Logger = NexusLogEngine.getLogger;
-	def MakeLogger(channel:String):Logger = NexusLogEngine.makeLog(channel);
-	def MakeLogger(c:Any):Logger = NexusLogEngine.makeLog(c.getClass.getSimpleName);
+	def log(channel:String, level:Level, data:String) = NexusLogEngine.log(channel, level, data)
+	def log(level:Level, data:String) = NexusLogEngine.log(level, data)
+	def log(channel:String, level:Level, ex:Throwable, data:String) = NexusLogEngine.log(channel, level, ex, data)
+	def log(level:Level, ex:Throwable, data:String) = NexusLogEngine.log(level, ex, data)
+	def severe(data:String) = NexusLogEngine.log(Level.SEVERE, data)
+	def warning(data:String) = NexusLogEngine.log(Level.WARNING, data)
+	def info(data:String) = NexusLogEngine.log(Level.INFO, data)
+	def fine(data:String) = NexusLogEngine.log(Level.FINE, data)
+	def finer(data:String) = NexusLogEngine.log(Level.FINER, data)
+	def finest(data:String) = NexusLogEngine.log(Level.FINEST, data)
+	def off(data:String) = NexusLogEngine.log(Level.OFF, data)
+	def all(data:String) = NexusLogEngine.log(Level.ALL, data)
+	def getLogger:Logger = NexusLogEngine.getLogger
+	def MakeLogger(channel:String):Logger = NexusLogEngine.makeLog(channel)
+	def MakeLogger(c:Any):Logger = NexusLogEngine.makeLog(c.getClass.getSimpleName)
 }

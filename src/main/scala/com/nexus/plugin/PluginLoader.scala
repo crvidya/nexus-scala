@@ -25,15 +25,15 @@ import java.util.jar.JarFile
 object PluginLoader {
 
 	private final val PLUGIN_DIR = new JFile(Properties.propOrElse("nexus.plugin.dir", "plugins"))
-	private final val PluginCandidates:JList[PluginCandidate] = Lists.newArrayList();
+	private final val PluginCandidates:JList[PluginCandidate] = Lists.newArrayList()
 	
-	def loadPlugins{
+	def loadPlugins(){
 		for(p <- PLUGIN_DIR.listFiles(PluginFilter)){
-			this.PluginCandidates.add(new PluginCandidate(new JarFile(p)));
+			this.PluginCandidates.add(new PluginCandidate(new JarFile(p)))
 		}
 	}
 	
 	object PluginFilter extends FilenameFilter{
-		def accept(file:JFile, name:String):Boolean = file.getName().endsWith(".jar")
+		def accept(file:JFile, name:String):Boolean = file.getName.endsWith(".jar")
 	}
 }

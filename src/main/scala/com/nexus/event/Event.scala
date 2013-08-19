@@ -34,7 +34,7 @@ class Event {
   private final val eventCancelable:Boolean = this.hasAnnotation(classOf[Cancelable])
   private final val eventHasResult:Boolean = this.hasAnnotation(classOf[HasResult])
 
-  this.setup
+  this.setup()
 
   private def hasAnnotation(ann:Class[_ <: Annotation]):Boolean = {
     var cls:Class[_] = this.getClass

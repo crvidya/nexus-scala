@@ -50,17 +50,17 @@ class WebServerResponse(private final val request: WebServerRequest = null) {
     if(SslContextProvider.isValid) this.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"Nexus\"")
     this.headersReadyToSend = true
   }
-  private def sendHeadersToSession = try {
+  private def sendHeadersToSession() = try {
     this.ctx.write(this.httpResponse)
     this.headersSent = true
   }
-  def forceSendHeaders{
+  def forceSendHeaders(){
     if(!this.headersReadyToSend) throw new IllegalStateException("WebServerStatus and headers are not set!")
-    this.sendHeadersToSession
+    this.sendHeadersToSession()
   }
   def forceSendHeaders(status:HttpResponseStatus){
     if(!this.headersReadyToSend) this.sendHeaders(status)
-    this.sendHeadersToSession
+    this.sendHeadersToSession()
   }
   def sendData(p:TWebServerResponse){
     if(!this.headersReadyToSend) throw new IllegalStateException("WebServerStatus and headers are not set!")
@@ -70,14 +70,14 @@ class WebServerResponse(private final val request: WebServerRequest = null) {
     if(length == 0){
       this.setHeader(HttpHeaders.Names.CONTENT_LENGTH, "0")
       this.forceSendHeaders(HttpResponseStatus.NO_CONTENT)
-      this.close
+      this.close()
       return
     }
 
     this.setHeader(HttpHeaders.Names.CONTENT_TYPE, "%s; charset=UTF-8".format(p.getMimeType))
 
-    if(!this.headersSent) this.forceSendHeaders
-    if(this.httpRequest != null && this.httpRequest.getMethod() == HttpMethod.HEAD) return
+    if(!this.headersSent) this.forceSendHeaders()
+    if(this.httpRequest != null && this.httpRequest.getMethod == HttpMethod.HEAD) return
     this.ctx.write(Unpooled.copiedBuffer(data, CharsetUtil.UTF_8))
   }
   def sendError(s:String){
@@ -90,7 +90,7 @@ class WebServerResponse(private final val request: WebServerRequest = null) {
     p.addEventResult(e)
     this.sendData(p)
   }*/
-  def close{
+  def close(){
     this.ctx.flush().close()
     this.responseClosed = true
   }

@@ -31,10 +31,9 @@ class ConfigTag(var parent: ConfigTagParent, var name: String) extends ConfigTag
   var qualifiedName = parent.getNameQualifier + name
   var newline = parent.newlinemode == 2
   this.parent.addChild(this)
-  private var IDBase:Int = _
 
   override def getNameQualifier = this.qualifiedName + "."
-  def saveConfig = parent.saveConfig
+  def saveConfig() = parent.saveConfig()
   def onLoaded = this
   def setValue(value: String){
     this.value = value
@@ -113,32 +112,22 @@ class ConfigTag(var parent: ConfigTagParent, var name: String) extends ConfigTag
 
   def setNewLine(b: Boolean): ConfigTag = {
     newline = b
-    saveConfig
+    this.saveConfig()
     this
   }
 
   def useBraces: ConfigTag = {
     brace = true
     if (parent.newlinemode == 1) newline = true
-    saveConfig
+    this.saveConfig()
     this
   }
 
   def setPosition(pos: Int): ConfigTag = {
     position = pos
-    saveConfig
+    this.saveConfig()
     this
   }
 
   override def containsTag(tagname: String) = getTag(tagname, false) != null
-  def getId(name: String, defaultValue: Int) = this.getTag(name).getIntValue(defaultValue)
-  def getId(name: String): Int = {
-    val ret: Int = getId(name, IDBase)
-    IDBase = ret + 1
-    ret
-  }
-  def setBaseID(i: Int): ConfigTag = {
-    IDBase = i
-    this
-  }
 }

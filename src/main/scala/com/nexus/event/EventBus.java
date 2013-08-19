@@ -67,7 +67,7 @@ public class EventBus{
                         break;
                     }
                 }catch(NoSuchMethodException e){
-
+                    //This means the method does not exist in a super class, ignore it
                 }
             }
         }

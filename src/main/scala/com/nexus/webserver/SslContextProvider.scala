@@ -50,12 +50,8 @@ object SslContextProvider extends TLoader {
         serverContext = SSLContext.getInstance(PROTOCOL)
         serverContext.init(kmf.getKeyManagers, null, null)
         this.valid = true
-      }catch{
-        case e: Exception =>
-      }
-    }catch{
-      case e: Exception =>
-    }
+      }catch{case e: Exception =>}
+    }catch{case e: Exception =>}
     if(this.valid) NexusLog.info("Valid SSL certificate was found")
     else NexusLog.info("No valid SSL certificate was found")
   }

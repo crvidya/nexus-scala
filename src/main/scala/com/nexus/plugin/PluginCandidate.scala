@@ -24,10 +24,9 @@ class PluginCandidate(private final val file:JarFile) {
 
 	def getContainerFile = this.file
 	def explore:JList[PluginContainer] = {
-		val manifest = this.file.getManifest()
-		val plugins = manifest.getEntries().get("NexusPlugin").get("NexusPlugin"); //FIXME: untested
-		if(plugins == null || plugins == ""){
-			return Lists.newArrayListWithCapacity(0)
-		}else return PluginContainerBuilder.getContainers(plugins.toString()) //XXX
+		val manifest = this.file.getManifest
+		val plugins = manifest.getEntries.get("NexusPlugin").get("NexusPlugin"); //FIXME: untested
+		if(plugins == null || plugins == "") Lists.newArrayListWithCapacity(0)
+		else PluginContainerBuilder.getContainers(plugins.toString) //FIXME
 	}
 }

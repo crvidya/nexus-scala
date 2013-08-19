@@ -45,7 +45,7 @@ class ListenerListInst(private var parent: ListenerListInst = null) {
     ret
   }
   def getListeners: Array[IEventListener] = {
-    if(this.shouldRebuild) this.buildCache
+    if(this.shouldRebuild) this.buildCache()
     this.listeners
   }
   private def buildCache(){

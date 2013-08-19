@@ -53,7 +53,7 @@ class WebServerHandlerHtml extends TWebServerHandler {
       return
     }
     if(file.isDirectory){
-      if(uri.endsWith("/")) {}//this.sendFileList(ctx, file)
+      if(uri.endsWith("/")) {}//this.sendFileList(ctx, file) //TODO: file list?
       else this.sendRedirect(ctx, uri + "/")
       return
     }

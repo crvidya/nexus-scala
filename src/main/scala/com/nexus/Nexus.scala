@@ -29,6 +29,7 @@ import com.nexus.event.EventBus
 import com.nexus.event.events.ServerStartedEvent
 import com.nexus.time.ticks.Timer
 import com.nexus.concurrent.WorkerPool
+import com.nexus.data.couchdb.CouchDB
 
 object Nexus {
 
@@ -38,6 +39,7 @@ object Nexus {
   private var config: ConfigFile = null
 
   this.loaders.add(WorkerPool)
+  this.loaders.add(CouchDB)
   this.loaders.add(WebServerHandlerRegistry)
 	this.loaders.add(SslContextProvider)
 	this.loaders.add(WebServer)

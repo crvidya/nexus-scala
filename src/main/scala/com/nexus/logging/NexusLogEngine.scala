@@ -42,8 +42,8 @@ object NexusLogEngine {
 			}
 			if(interrupted) Thread.currentThread().interrupt()
 		}
-		override def close{}
-		override def flush{}
+		override def close(){}
+		override def flush(){}
 	}
 	
 	private object ConsoleLogThread extends Thread {
@@ -52,12 +52,12 @@ object NexusLogEngine {
 		val recordQueue = new LinkedBlockingQueue[LogRecord]
 		this.setName("Logger")
 		this.setDaemon(true)
-		override def run{
+		override def run(){
 			while(true){
 				try{
 					val record = ConsoleLogThread.recordQueue.take()
 					if(record != null){
-						if(record.getLevel().equals(Level.SEVERE)) this.stdErrHandler.publish(record)
+						if(record.getLevel.equals(Level.SEVERE)) this.stdErrHandler.publish(record)
 						else this.stdOutHandler.publish(record)
 					}
 				}catch{
@@ -71,23 +71,23 @@ object NexusLogEngine {
 	}
 	
 	private class LoggingOutStream(log:Logger, level:Level) extends ByteArrayOutputStream {
-		private final val currentMessage:StringBuilder = new StringBuilder();
+		private final val currentMessage:StringBuilder = new StringBuilder()
 		
 		override def flush(){
-			var record:String = null;
+			var record:String = null
 			this.synchronized{
-				super.flush;
-				record = this.toString;
-				super.reset;
-				currentMessage.append(record.replace(NexusLogFormatter.LINE_SEPERATOR, "\n"));
-				var lastidx = -1;
-				var idx = currentMessage.indexOf("\n", lastidx + 1);
+				super.flush()
+				record = this.toString
+				super.reset()
+				currentMessage.append(record.replace(NexusLogFormatter.LINE_SEPERATOR, "\n"))
+				var lastidx = -1
+				var idx = currentMessage.indexOf("\n", lastidx + 1)
 				while(idx >= 0){
-					log.log(this.level, currentMessage.substring(lastidx + 1, idx));
-					lastidx = idx;
-					idx = currentMessage.indexOf("\n", lastidx + 1);
+					log.log(this.level, currentMessage.substring(lastidx + 1, idx))
+					lastidx = idx
+					idx = currentMessage.indexOf("\n", lastidx + 1)
 				}
-				if(lastidx >= 0) currentMessage.setLength(0);
+				if(lastidx >= 0) currentMessage.setLength(0)
 			}
 		}
 	}
@@ -99,9 +99,9 @@ object NexusLogEngine {
 	private var Formatter:NexusLogFormatter = null
 	private var MinLevel:Level = Level.FINER
 	
-	def configureLogging{
+	def configureLogging(){
 		System.out.println("Configuring the nexus logger")
-		LogManager.getLogManager().reset()
+		LogManager.getLogManager.reset()
 		val globalLogger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
 		globalLogger.setLevel(Level.OFF)
 		NexusLogEngine.NexusLogger = Logger.getLogger("Nexus")
@@ -114,20 +114,19 @@ object NexusLogEngine {
 		ConsoleLogThread.start()
 		this.Formatter = new NexusLogFormatter
 		try{
-			val logPath = new File("nexus-log-%g.log")
-			this.FileHandler = new FileHandler(new File("nexus-log-%g.log").getPath(), 0, 3){
-				override def close{}
+			this.FileHandler = new FileHandler(new File("nexus-log-%g.log").getPath, 0, 3){
+				override def close(){}
 			}
 		}
-		this.resetLoggingHandlers
+		this.resetLoggingHandlers()
 		this.stdErrCache = System.err
 		this.stdOutCache = System.out
 		System.setErr(new PrintStream(new LoggingOutStream(stdErrLogger, Level.SEVERE), true))
 		System.setOut(new PrintStream(new LoggingOutStream(stdOutLogger, Level.INFO), true))
 		this.isConfigured = true
 	}
-	private def resetLoggingHandlers{
-		val level = Level.parse(Properties.propOrElse("nexus.log.level", this.MinLevel.toString()))
+	private def resetLoggingHandlers(){
+		val level = Level.parse(Properties.propOrElse("nexus.log.level", this.MinLevel.toString))
 		ConsoleLogThread.stdOutHandler.setLevel(level)
 		ConsoleLogThread.stdErrHandler.setLevel(level)
 		NexusLogFormatter.UseColors = Properties.propOrElse("nexus.log.nocolor", "false").equals("false")
@@ -143,41 +142,41 @@ object NexusLogEngine {
 		NexusLogEngine.NexusLogger.addHandler(NexusHandler)*/
 	}
 	def setUseColors(c:Boolean) = NexusLogFormatter.UseColors = c
-	def setMinLevel(l:Level) = this.MinLevel = Level.parse(sys.props.get("nexus.log.level").getOrElse(l.toString()))
+	def setMinLevel(l:Level) = this.MinLevel = Level.parse(sys.props.get("nexus.log.level").getOrElse(l.toString))
 	def getMinLevel = this.MinLevel
 	
 	def makeLog(channel:String):Logger = {
 		val l = Logger.getLogger(channel)
 		l.setParent(NexusLogEngine.NexusLogger)
-		return l
+		l
 	}
 	
-	def log(channel:String, level:Level, format:String, data:Any*){
-		if(!this.isConfigured) this.configureLogging
-		this.makeLog(channel).log(level, String.format(format, data))
+	def log(channel:String, level:Level, data: String){
+		if(!this.isConfigured) this.configureLogging()
+		this.makeLog(channel).log(level, data)
 	}
 	
-	def log(level:Level, format:String, data:Any*){
-		if(!this.isConfigured) this.configureLogging
-		NexusLogEngine.NexusLogger.log(level, String.format(format, data))
+	def log(level:Level, data:String){
+		if(!this.isConfigured) this.configureLogging()
+		NexusLogEngine.NexusLogger.log(level, data)
 	}
 	
-	def log(channel:String, level:Level, ex:Throwable, format:String, data:Any*){
-		if(!this.isConfigured) this.configureLogging
-		this.makeLog(channel).log(level, String.format(format, data), ex)
+	def log(channel:String, level:Level, ex:Throwable, data:String){
+		if(!this.isConfigured) this.configureLogging()
+		this.makeLog(channel).log(level, data, ex)
 	}
 	
-	def log(level:Level, ex:Throwable, format:String, data:Any*){
-		if(!this.isConfigured) this.configureLogging
-		NexusLogEngine.NexusLogger.log(level, String.format(format, data), ex)
+	def log(level:Level, ex:Throwable, data:String){
+		if(!this.isConfigured) this.configureLogging()
+		NexusLogEngine.NexusLogger.log(level, data, ex)
 	}
 	
-	def severe(format:String, data:Any*) = this.log(Level.SEVERE, format, data)
-	def warning(format:String, data:Any*) = this.log(Level.WARNING, format, data)
-	def info(format:String, data:Any*) = this.log(Level.INFO, format, data)
-	def fine(format:String, data:Any*) = this.log(Level.FINE, format, data)
-	def finer(format:String, data:Any*) = this.log(Level.FINER, format, data)
-	def finest(format:String, data:Any*) = this.log(Level.FINEST, format, data)
+	def severe(format:String) = this.log(Level.SEVERE, format)
+	def warning(format:String) = this.log(Level.WARNING, format)
+	def info(format:String) = this.log(Level.INFO, format)
+	def fine(format:String) = this.log(Level.FINE, format)
+	def finer(format:String) = this.log(Level.FINER, format)
+	def finest(format:String) = this.log(Level.FINEST, format)
 	def getLogger = this.NexusLogger
 	def getOutCache = this.stdOutCache
 	def getErrCache = this.stdErrCache

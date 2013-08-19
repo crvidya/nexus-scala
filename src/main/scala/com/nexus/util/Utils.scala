@@ -40,7 +40,7 @@ object Utils {
       uri.startsWith(".") || uri.endsWith(".")) {
       return null
     }
-    return uri
+    uri
 	}
 
   def getMimeType(f:File):String = new MimetypesFileTypeMap().getContentType(f)
@@ -61,14 +61,14 @@ object Utils {
         case chr =>
           if((chr>='\u0000' && chr<='\u001F') || (chr>='\u007F' && chr<='\u009F') || (chr>='\u2000' && chr<='\u20FF')){
             val ss = Integer.toHexString(chr)
-            sb.append("\\u");
-            for(k <- 0 until 4-ss.length){
-              sb.append('0');
+            sb.append("\\u")
+            for(k <- 0 until 4 - ss.length){
+              sb.append('0')
             }
-            sb.append(ss.toUpperCase());
-          }else sb.append(chr);
+            sb.append(ss.toUpperCase)
+          }else sb.append(chr)
       }
     }
-    return sb.toString()
+    sb.toString()
   }
 }

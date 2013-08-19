@@ -35,13 +35,10 @@ class WebServerHandlerWebsocket(private final val websocketPath: String) extends
     if(this.handshaker == null) WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel())
     else handshaker.handshake(ctx.channel(), req)
   }
-  def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) =
-    if(frame.isInstanceOf[CloseWebSocketFrame]) this.handshaker.close(ctx.channel(), frame.retain().asInstanceOf[CloseWebSocketFrame])
-    else if(frame.isInstanceOf[PingWebSocketFrame]) ctx.channel().write(new PongWebSocketFrame(frame.content().retain()))
-    else if(!frame.isInstanceOf[TextWebSocketFrame]) throw new UnsupportedOperationException("%s frame types not supported".format(frame.getClass.getName))
-    else{
-      val data = frame.asInstanceOf[TextWebSocketFrame].text()
-      println("Received: " + data)
-      ctx.channel().write(new TextWebSocketFrame("Echo:" + data))
-    }
+  def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) = frame match{
+    case f: CloseWebSocketFrame => this.handshaker.close(ctx.channel(), f.retain())
+    case f: PingWebSocketFrame => ctx.channel().write(new PongWebSocketFrame(f.content().retain()))
+    case f: TextWebSocketFrame => {ctx.channel().write(new TextWebSocketFrame("Echo: " + data))} //TODO: handle frames!
+    case f => throw new UnsupportedOperationException("%s frame types not supported".format(frame.getClass.getName))
+  }
 }

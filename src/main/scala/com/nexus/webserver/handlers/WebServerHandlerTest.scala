@@ -45,6 +45,6 @@ class WebServerHandlerTest extends TWebServerHandler {
     response.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"Nexus\"")
     response.forceSendHeaders(HttpResponseStatus.UNAUTHORIZED)
     //response.sendData(obj)
-    response.close
+    response.close()
   }
 }

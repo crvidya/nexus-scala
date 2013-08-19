@@ -18,20 +18,35 @@ package com.nexus.data.json
 
 import java.io.Reader
 import java.util.Collections
-import java.util.Iterator
-import java.util.List
+import java.util
 import java.lang.Iterable
 import com.google.common.collect.Lists
 import com.nexus.webserver.TWebServerResponse
+import scala.collection.JavaConversions._
 
 object JsonArray {
   def readFrom(reader: Reader) = JsonValue.readFrom(reader).asArray
   def readFrom(string: String) = JsonValue.readFrom(string).asArray
+  implicit def asJsonArray(c: util.Collection): JsonArray = {
+    val a = new JsonArray
+    for(o <- c){
+      o match{
+        case i: Int => a.add(i)
+        case l: Long => a.add(l)
+        case f: Float => a.add(f)
+        case d: Double => a.add(d)
+        case b: Boolean => a.add(b)
+        case s: String => a.add(s)
+        case v: JsonValue => a.add(v)
+        case e => throw new RuntimeException("Unsupported conversion, from %s to JsonValue".format(e.getClass.getSimpleName))
+      }
+    }
+  }
 }
 
 class JsonArray extends JsonValue with Iterable[JsonValue] with TWebServerResponse {
 
-  private final val values: List[JsonValue] = Lists.newArrayList()
+  private final val values: util.List[JsonValue] = Lists.newArrayList()
 
   def add(value: Int): JsonArray = {
     this.values.add(JsonValue.valueOf(value))
@@ -110,12 +125,12 @@ class JsonArray extends JsonValue with Iterable[JsonValue] with TWebServerRespon
   def get(index: Int): JsonValue = this.values.get(index)
   def getValues = Collections.unmodifiableList(this.values)
 
-  def iterator: Iterator[JsonValue] = {
-    val iterator: Iterator[JsonValue] = this.values.iterator
-    new Iterator[JsonValue] {
+  def iterator: util.Iterator[JsonValue] = {
+    val iterator: util.Iterator[JsonValue] = this.values.iterator
+    new util.Iterator[JsonValue] {
       def hasNext: Boolean = iterator.hasNext
       def next: JsonValue = iterator.next
-      def remove = throw new UnsupportedOperationException
+      def remove() = throw new UnsupportedOperationException
     }
   }
   private [json] def write(writer: JsonWriter) = writer.writeArray(this)

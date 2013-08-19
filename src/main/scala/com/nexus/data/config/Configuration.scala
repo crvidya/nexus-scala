@@ -46,10 +46,7 @@ class Configuration(var propertyFile: File, var saveOnChange: Boolean = true, va
         }
       }
       reader.close()
-    }
-    catch{
-      case e: Exception => throw new RuntimeException(e)
-    }
+    }catch{case e: Exception => throw new RuntimeException(e)}
     loading = false
   }
 

@@ -37,7 +37,7 @@ trait TWebServerHandler {
   def handle(request: WebServerRequest, response: WebServerResponse){
     response.sendHeaders(HttpResponseStatus.NOT_FOUND)
     response.sendError("This handler is not implemented")
-    response.close
+    response.close()
   }
 
   protected final val HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz"
@@ -48,7 +48,7 @@ trait TWebServerHandler {
     val res = new WebServerResponse(ctx)
     res.sendHeaders(status)
     res.sendError(status.toString)
-    res.close
+    res.close()
   }
   protected def sendRedirect(ctx: ChannelHandlerContext, destination: String){
     val response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND)

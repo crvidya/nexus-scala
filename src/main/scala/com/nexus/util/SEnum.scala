@@ -23,7 +23,7 @@ package com.nexus.util
  */
 abstract class SEnum extends Enumeration {
   class EnumValue(elementName:String) extends Val(nextId, elementName) {
-    def getName:String = elementName;
+    def getName:String = elementName
   }
-  protected final def EnumValue(elementName:String):EnumValue = new EnumValue(elementName);
+  protected final def EnumValue(elementName:String):EnumValue = new EnumValue(elementName)
 }

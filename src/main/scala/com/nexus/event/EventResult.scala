@@ -24,8 +24,8 @@ import com.nexus.util.SEnum
  * @author jk-5
  */
 object EventResult extends SEnum {
-  type EventResult = Value;
-  val DENY = EnumValue("DENY");
-  val DEFAULT = EnumValue("DEFAULT");
-  val ALLOW = EnumValue("ALLOW");
+  type EventResult = Value
+  val DENY = EnumValue("DENY")
+  val DEFAULT = EnumValue("DEFAULT")
+  val ALLOW = EnumValue("ALLOW")
 }

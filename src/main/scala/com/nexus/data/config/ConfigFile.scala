@@ -102,7 +102,7 @@ class ConfigFile(var file: File) extends ConfigTagParent {
     this
   }
   def getNameQualifier = ""
-  def saveConfig {
+  def saveConfig() {
     if(this.loading) return
     var writer: PrintWriter = null
     try writer = new PrintWriter(file)

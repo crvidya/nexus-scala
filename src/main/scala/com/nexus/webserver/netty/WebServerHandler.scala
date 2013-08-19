@@ -35,10 +35,13 @@ import io.netty.handler.codec.base64.Base64
 class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
   private var handler: TWebServerHandler = _
   private var request: HttpRequest = _
-  override def channelReadComplete(ctx: ChannelHandlerContext) = ctx.flush() //FIXME!
-  override def channelRead0(ctx: ChannelHandlerContext, msg: AnyRef) = {
-    if(msg.isInstanceOf[FullHttpRequest]) this.handleHttpRequest(ctx, msg.asInstanceOf[FullHttpRequest])
-    else if(msg.isInstanceOf[WebSocketFrame]) this.handleWebSocketFrame(ctx, msg.asInstanceOf[WebSocketFrame])
+  override def channelReadComplete(ctx: ChannelHandlerContext) = ctx.flush()
+  override def channelRead0(ctx: ChannelHandlerContext, msg: AnyRef) = msg match{
+      case m: FullHttpRequest => this.handleHttpRequest(ctx, m)
+      case m: WebSocketFrame => this.handleWebSocketFrame(ctx, m)
+      case m => {
+        //TODO: handle unknown data
+      }
   }
   def handleHttpRequest(ctx: ChannelHandlerContext, req: FullHttpRequest) =
     if(!req.getDecoderResult.isSuccess) this.sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST))
@@ -72,8 +75,12 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
     }
   }
 
-  private def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) =
-    if(this.handler.isInstanceOf[WebServerHandlerWebsocket]) this.handler.asInstanceOf[WebServerHandlerWebsocket].handleWebSocketFrame(ctx, frame)
+  private def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) = this.handler match{
+    case h: WebServerHandlerWebsocket => h.handleWebSocketFrame(ctx, frame)
+    case h => {
+      //TODO: handle this
+    }
+  }
 
   private def sendHttpResponse(ctx: ChannelHandlerContext, req: FullHttpRequest, res: FullHttpResponse){
     if(res.getStatus.code() != 200){

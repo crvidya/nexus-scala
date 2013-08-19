@@ -18,7 +18,7 @@ package com.nexus.webserver
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http._
-import java.util.{Map, List}
+import java.util
 import com.google.common.collect.Lists
 import com.nexus.util.Utils
 import java.util.regex.Pattern
@@ -33,9 +33,9 @@ object WebServerHandlerFactory {
   def handleRequest(ctx: ChannelHandlerContext, req: FullHttpRequest): TWebServerHandler = {
     try{
       var handler:TWebServerHandler = null
-      val args: List[String] = Lists.newArrayList()
+      val args: util.List[String] = Lists.newArrayList()
       var breakIterator = false
-      for(e: Map.Entry[String, TWebServerHandler] <- WebServerHandlerRegistry.getHandlers.entrySet() if(!breakIterator)){
+      for(e: util.Map.Entry[String, TWebServerHandler] <- WebServerHandlerRegistry.getHandlers.entrySet() if !breakIterator){
         var path = Utils.sanitizeURI(req.getUri)
         val regex = Pattern.compile(e.getKey)
         val matcher = regex.matcher(path)
@@ -57,6 +57,6 @@ object WebServerHandlerFactory {
       }
       return handler
     }
-    return null
+    null
   }
 }
