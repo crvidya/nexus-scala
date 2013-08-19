@@ -16,12 +16,16 @@
 
 
 
+
+
 apply plugin:'java'
 apply plugin:'scala'
 apply plugin:'maven'
+apply plugin:'idea'
 
 group = 'com.nexus'
 version = '1.0-SNAPSHOT'
+archivesBaseName = 'nexus'
 
 repositories{
     mavenCentral()
@@ -33,12 +37,18 @@ jar{
     }
 }
 
+processResources{
+    eachFile{
+        expand 'version':project.version
+    }
+}
+
 dependencies{
-    compile 'org.scala-lang:scala-library:2.10.2'
+    compile 'org.scala-lang:scala-library:2.9.3'
     compile 'com.google.guava:guava:14.0.1'
     compile 'io.netty:netty-all:4.0.7.Final'
     compile 'org.ow2.asm:asm-all:4.1'
-    compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'     //Needed for guava
 
     //testCompile "junit:junit:4.11"
 }
