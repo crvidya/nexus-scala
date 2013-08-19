@@ -17,7 +17,7 @@
 package com.nexus.concurrent
 
 import com.nexus.Nexus
-import java.util.concurrent.{Future, ThreadFactory, Callable, Executors}
+import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicInteger
 import com.nexus.traits.TLoader
 
@@ -27,10 +27,10 @@ import com.nexus.traits.TLoader
  * @author jk-5
  */
 object WorkerPool extends TLoader {
-  private final val pool = Executors.newFixedThreadPool(Nexus.getConfig.getTag("numberOfWorkers").setComment("The number of worker threads that will be used for all kinds of async tasks").getIntValue(4), WorkerThreadFactory)
+  private var pool: ExecutorService = _
   def execute(r: Runnable) = this.pool.execute(r)
   def submit[T](c: Callable[T]): Future[T] = this.pool.submit(c)
-  def load(){}
+  def load() = this.pool = Executors.newFixedThreadPool(Nexus.getConfig.getTag("numberOfWorkers").setComment("The number of worker threads that will be used for all kinds of async tasks").getIntValue(4), WorkerThreadFactory)
 }
 
 object WorkerThreadFactory extends ThreadFactory {
