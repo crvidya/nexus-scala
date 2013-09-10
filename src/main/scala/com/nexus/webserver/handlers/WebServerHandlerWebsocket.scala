@@ -33,12 +33,14 @@ class WebServerHandlerWebsocket(private final val websocketPath: String) extends
     val factory = new WebSocketServerHandshakerFactory("%s://".format(if(SslContextProvider.isValid) "wss" else "ws") + req.headers().get(HttpHeaders.Names.HOST + this.websocketPath), null, false)
     this.handshaker = factory.newHandshaker(req)
     if(this.handshaker == null) WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel())
-    else handshaker.handshake(ctx.channel(), req)
+    else{
+      handshaker.handshake(ctx.channel(), req)
+    }
   }
   def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) = frame match{
     case f: CloseWebSocketFrame => this.handshaker.close(ctx.channel(), f.retain())
     case f: PingWebSocketFrame => ctx.channel().write(new PongWebSocketFrame(f.content().retain()))
-    case f: TextWebSocketFrame => {ctx.channel().write(new TextWebSocketFrame("Echo: " + data))} //TODO: handle frames!
+    case f: TextWebSocketFrame => {ctx.channel().write(new TextWebSocketFrame("Echo: " + f.text()))} //TODO: handle frames!
     case f => throw new UnsupportedOperationException("%s frame types not supported".format(frame.getClass.getName))
   }
 }

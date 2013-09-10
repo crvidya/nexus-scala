@@ -52,7 +52,7 @@ object Nexus {
 
     Timer.startTimer()
 
-		this.loaders.foreach(l=>l.load)
+		this.loaders.foreach(l=>l.load())
 
     this.getEventBus.post(new ServerStartedEvent)
 	}

@@ -35,5 +35,5 @@ object WorkerPool extends TLoader {
 
 object WorkerThreadFactory extends ThreadFactory {
   private final val workerNumber = new AtomicInteger(1)
-  def newThread(r: Runnable): Thread = new Thread(r, "Nexus worker " + workerNumber.getAndIncrement)
+  def newThread(r: Runnable): Thread = new Thread(r, "Nexus-Worker-" + workerNumber.getAndIncrement)
 }

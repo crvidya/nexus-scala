@@ -22,6 +22,7 @@ import io.netty.handler.ssl.SslHandler
 import io.netty.handler.codec.http.{HttpResponseEncoder, HttpObjectAggregator, HttpRequestDecoder}
 import io.netty.handler.stream.ChunkedWriteHandler
 import com.nexus.webserver.SslContextProvider
+import com.nexus.network.codec.WebsocketPacketEncoder
 
 /**
  * TODO: Enter description
@@ -41,6 +42,8 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
     pipe.addLast("encoder", new HttpResponseEncoder)
     //pipe.addLast("deflater", new HttpContentCompressor(1))   //FIXME: gzip
     pipe.addLast("chunkedWriter", new ChunkedWriteHandler)
+    pipe.addLast("websocketEncoder", new WebsocketPacketEncoder())
+    //pipe.addLast("websocketDecoder", new WebsocketPacketDecoder())
     pipe.addLast("handler", new WebServerHandler)
   }
 }

@@ -27,7 +27,7 @@ import scala.collection.JavaConversions._
 object JsonArray {
   def readFrom(reader: Reader) = JsonValue.readFrom(reader).asArray
   def readFrom(string: String) = JsonValue.readFrom(string).asArray
-  implicit def asJsonArray(c: util.Collection): JsonArray = {
+  implicit def asJsonArray(c: util.Collection[_]): JsonArray = {
     val a = new JsonArray
     for(o <- c){
       o match{
@@ -41,6 +41,7 @@ object JsonArray {
         case e => throw new RuntimeException("Unsupported conversion, from %s to JsonValue".format(e.getClass.getSimpleName))
       }
     }
+    a
   }
 }
 

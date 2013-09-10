@@ -58,7 +58,7 @@ abstract class JsonValue extends Serializable {
   def isFalse = false
   def isNull = false
 
-  def asObject: AnyRef = throw new UnsupportedOperationException("Not an object: " + toString)
+  def asObject: JsonObject = throw new UnsupportedOperationException("Not an object: " + toString)
   def asArray: JsonArray = throw new UnsupportedOperationException("Not an array: " + toString)
   def asInt: Int = throw new UnsupportedOperationException("Not a number: " + toString)
   def asLong: Long = throw new UnsupportedOperationException("Not a number: " + toString)
