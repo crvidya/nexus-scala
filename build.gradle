@@ -44,7 +44,7 @@ processResources{
 }
 
 dependencies{
-    compile 'org.scala-lang:scala-library:2.9.3'
+    compile 'org.scala-lang:scala-library:2.10.2'
     compile 'com.google.guava:guava:14.0.1'
     compile 'io.netty:netty-all:4.0.7.Final'
     compile 'org.ow2.asm:asm-all:4.1'

@@ -19,7 +19,7 @@ package com.nexus.event.events
 import com.nexus.event.Event
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

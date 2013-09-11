@@ -16,7 +16,7 @@
 
 package com.nexus.network.handlers
 
-import com.nexus.network.handlers.NetworkHandler
+import com.nexus.network.packet.Packet
 
 /**
  * No description given
@@ -26,6 +26,10 @@ import com.nexus.network.handlers.NetworkHandler
 class NetworkHandlerConnect extends NetworkHandler {
 
   def identify(){
+
+  }
+
+  def sendPacket(packet: Packet){
 
   }
 }

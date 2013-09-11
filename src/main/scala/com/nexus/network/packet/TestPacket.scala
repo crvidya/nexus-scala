@@ -5,7 +5,7 @@ import com.nexus.concurrent.WorkerPool
 import java.util.concurrent.FutureTask
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

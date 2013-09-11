@@ -22,7 +22,7 @@ import io.netty.handler.codec.http.{HttpHeaders, FullHttpRequest}
 import io.netty.handler.codec.http.websocketx._
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */
@@ -40,7 +40,11 @@ class WebServerHandlerWebsocket(private final val websocketPath: String) extends
   def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) = frame match{
     case f: CloseWebSocketFrame => this.handshaker.close(ctx.channel(), f.retain())
     case f: PingWebSocketFrame => ctx.channel().write(new PongWebSocketFrame(f.content().retain()))
-    case f: TextWebSocketFrame => {ctx.channel().write(new TextWebSocketFrame("Echo: " + f.text()))} //TODO: handle frames!
+    case f: TextWebSocketFrame => {
+      //TODO: handle these frames!
+      if(f.text().equalsIgnoreCase("login")) this.getNettyHandler.getReadTimeoutHandler.handlerRemoved(null) //Hacky way to call destroy()
+      ctx.channel().write(new TextWebSocketFrame("Echo: " + f.text()))
+    }
     case f => throw new UnsupportedOperationException("%s frame types not supported".format(frame.getClass.getName))
   }
 }

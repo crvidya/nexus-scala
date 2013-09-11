@@ -26,16 +26,20 @@ import com.nexus.webserver.handlers.WebServerHandlerWebsocket
 import io.netty.handler.ssl.NotSslRecordException
 import com.nexus.webserver.{WebServerHandlerFactory, TWebServerHandler}
 import io.netty.handler.codec.base64.Base64
+import io.netty.handler.timeout.ReadTimeoutHandler
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */
 class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
   private var handler: TWebServerHandler = _
   private var request: HttpRequest = _
+  private var readTimeoutHandler: ReadTimeoutHandler = _
+
   override def channelReadComplete(ctx: ChannelHandlerContext) = ctx.flush()
+
   override def channelRead0(ctx: ChannelHandlerContext, msg: AnyRef) = msg match{
       case m: FullHttpRequest => this.handleHttpRequest(ctx, m)
       case m: WebSocketFrame => this.handleWebSocketFrame(ctx, m)
@@ -43,6 +47,7 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
         //TODO: handle unknown data
       }
   }
+
   def handleHttpRequest(ctx: ChannelHandlerContext, req: FullHttpRequest) =
     if(!req.getDecoderResult.isSuccess) this.sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST))
     else{
@@ -53,6 +58,7 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
       }
 
       this.handler = WebServerHandlerFactory.handleRequest(ctx, req)
+      this.handler.setNettyHandler(this)
       if(this.handler != null){
         if(this.handler.getClass.isAnnotationPresent(classOf[Authenticated])){
           //TODO: do authentication stuff
@@ -68,6 +74,7 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
         if(!HttpHeaders.isKeepAlive(req) || res.getStatus.code() != 200) f.addListener(ChannelFutureListener.CLOSE)
       }
     }
+
   override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
     if(cause.isInstanceOf[NotSslRecordException]){
       //this.sendRedirect(ctx, )
@@ -92,9 +99,13 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
     val f = ctx.channel().write(res)
     if(!HttpHeaders.isKeepAlive(req) || res.getStatus.code() != 200) f.addListener(ChannelFutureListener.CLOSE)
   }
+
   private def sendRedirect(ctx: ChannelHandlerContext, destination: String){
     val response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND)
     response.headers().set(HttpHeaders.Names.LOCATION, destination)
     ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE)
   }
+
+  def setReadTimeoutHandler(handler: ReadTimeoutHandler) = this.readTimeoutHandler = handler
+  def getReadTimeoutHandler = this.readTimeoutHandler
 }

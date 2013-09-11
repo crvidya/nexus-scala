@@ -23,7 +23,7 @@ import com.nexus.webserver.handlers.{WebServerHandlerTest, WebServerHandlerWebso
 import com.nexus.logging.NexusLog
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

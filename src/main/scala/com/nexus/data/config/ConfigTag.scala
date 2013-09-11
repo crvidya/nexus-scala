@@ -19,7 +19,7 @@ package com.nexus.data.config
 import java.io.PrintWriter
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

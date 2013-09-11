@@ -21,7 +21,7 @@ import com.google.common.collect.Lists
 import scala.collection.JavaConversions._
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

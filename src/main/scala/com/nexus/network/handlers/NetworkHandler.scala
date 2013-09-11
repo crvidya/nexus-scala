@@ -16,6 +16,8 @@
 
 package com.nexus.network.handlers
 
+import com.nexus.network.packet.Packet
+
 /**
  * No description given
  *
@@ -23,4 +25,5 @@ package com.nexus.network.handlers
  */
 abstract class NetworkHandler {
 
+  def sendPacket(packet: Packet)
 }

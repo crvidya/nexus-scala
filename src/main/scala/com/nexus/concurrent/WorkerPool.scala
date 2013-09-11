@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import com.nexus.traits.TLoader
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

@@ -19,7 +19,7 @@ package com.nexus.event
 import com.nexus.util.SEnum
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

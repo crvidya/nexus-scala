@@ -4,7 +4,7 @@ import com.nexus.data.json.JsonObject
 import com.nexus.network.PacketManager
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

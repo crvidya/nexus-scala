@@ -20,7 +20,7 @@ import java.lang.annotation.Annotation
 import com.nexus.event.EventResult._
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

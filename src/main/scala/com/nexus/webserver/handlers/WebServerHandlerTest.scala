@@ -21,7 +21,7 @@ import io.netty.handler.codec.http.{HttpHeaders, HttpResponseStatus}
 import com.nexus.data.json.{JsonArray, JsonObject}
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

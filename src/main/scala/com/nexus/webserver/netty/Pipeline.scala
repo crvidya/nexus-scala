@@ -19,10 +19,11 @@ package com.nexus.webserver.netty
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.ChannelInitializer
 import io.netty.handler.ssl.SslHandler
-import io.netty.handler.codec.http.{HttpResponseEncoder, HttpObjectAggregator, HttpRequestDecoder}
+import io.netty.handler.codec.http._
 import io.netty.handler.stream.ChunkedWriteHandler
 import com.nexus.webserver.SslContextProvider
 import com.nexus.network.codec.WebsocketPacketEncoder
+import io.netty.handler.timeout.ReadTimeoutHandler
 
 /**
  * TODO: Enter description
@@ -32,18 +33,24 @@ import com.nexus.network.codec.WebsocketPacketEncoder
 object Pipeline extends ChannelInitializer[SocketChannel] {
   override def initChannel(channel: SocketChannel){
     val pipe = channel.pipeline()
+
     if(SslContextProvider.isValid){
       val engine = SslContextProvider.getContext.createSSLEngine()
       engine.setUseClientMode(false)
       pipe.addLast("ssl", new SslHandler(engine))
     }
+    val readTimeoutHandler = new ReadTimeoutHandler(30)
+    val handler = new WebServerHandler
+    handler.setReadTimeoutHandler(readTimeoutHandler)
+
     pipe.addLast("decoder", new HttpRequestDecoder)
-    pipe.addLast("aggregator", new HttpObjectAggregator(65536))
     pipe.addLast("encoder", new HttpResponseEncoder)
-    //pipe.addLast("deflater", new HttpContentCompressor(1))   //FIXME: gzip
-    pipe.addLast("chunkedWriter", new ChunkedWriteHandler)
-    pipe.addLast("websocketEncoder", new WebsocketPacketEncoder())
+    //pipe.addLast("deflater", new HttpContentCompressor)
+    //pipe.addLast("inflater", new HttpContentDecompressor)
+    pipe.addLast("aggregator", new HttpObjectAggregator(1048576))
     //pipe.addLast("websocketDecoder", new WebsocketPacketDecoder())
-    pipe.addLast("handler", new WebServerHandler)
+    pipe.addLast("websocketEncoder", new WebsocketPacketEncoder())
+    pipe.addLast("readTimeoutHandler", readTimeoutHandler)
+    pipe.addLast("handler", handler)
   }
 }

@@ -22,13 +22,23 @@ import java.util._
 import java.text.SimpleDateFormat
 import com.nexus.util.Utils
 import java.io.File
+import com.nexus.webserver.netty.WebServerHandler
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */
 trait TWebServerHandler {
+
+  private var nettyHandler: WebServerHandler = _
+  protected final val HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz"
+  protected final val HTTP_DATE_GMT_TIMEZONE = "GMT"
+  protected final val HTTP_CACHE_SECONDS = 60
+
+  def setNettyHandler(handler: WebServerHandler) = this.nettyHandler = handler
+  def getNettyHandler = this.nettyHandler
+
   def handleRequest(ctx: ChannelHandlerContext, req: FullHttpRequest){
     val request = new WebServerRequest(ctx, req)
     val response = new WebServerResponse(request)
@@ -39,10 +49,6 @@ trait TWebServerHandler {
     response.sendError("This handler is not implemented")
     response.close()
   }
-
-  protected final val HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz"
-  protected final val HTTP_DATE_GMT_TIMEZONE = "GMT"
-  protected final val HTTP_CACHE_SECONDS = 60
 
   protected def sendError(ctx: ChannelHandlerContext, status: HttpResponseStatus){
     val res = new WebServerResponse(ctx)

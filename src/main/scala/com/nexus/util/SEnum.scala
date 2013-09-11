@@ -17,7 +17,7 @@
 package com.nexus.util
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

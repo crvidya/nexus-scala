@@ -22,7 +22,7 @@ import java.net.InetSocketAddress
 import com.nexus.util.Utils
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

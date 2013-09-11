@@ -25,7 +25,7 @@ import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.{MethodVisitor, ClassWriter, Opcodes, Type}
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */

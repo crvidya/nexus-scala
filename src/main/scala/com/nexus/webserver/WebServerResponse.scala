@@ -24,7 +24,7 @@ import io.netty.util.CharsetUtil
 import io.netty.channel.ChannelHandlerContext
 
 /**
- * TODO: Edit description
+ * No description given
  *
  * @author jk-5
  */
