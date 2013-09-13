@@ -16,27 +16,24 @@
 
 package com.nexus.network.handlers
 
-import com.nexus.network.packet.{PacketAuthenticationSuccess, Packet}
+import com.nexus.network.packet.{PacketCloseConnection, Packet}
+import io.netty.handler.codec.http.websocketx.{CloseWebSocketFrame, WebSocketServerHandshaker}
 import io.netty.channel.{ChannelFuture, ChannelHandlerContext}
-import com.nexus.webserver.netty.CancelableReadTimeoutHandler
+import com.nexus.webserver.netty.WebSocketHandler
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NetworkHandler(private final val ctx: ChannelHandlerContext) {
+class NetworkHandlerWebsocket(_ctx: ChannelHandlerContext) extends NetworkHandler(_ctx) {
 
-  def sendPacket(packet: Packet)
-  def closeConnection(reason: String): ChannelFuture
-  def closeConnection(): ChannelFuture = this.closeConnection("No reason given")
-  private def onHandlerRegistered() = {}
+  private val handshaker: WebSocketServerHandshaker = this.getChannelContext.channel().pipeline().get(classOf[WebSocketHandler]).getHandshaker
 
-  final def handlerRegistered(){
-    this.onHandlerRegistered()
-    this.sendPacket(new PacketAuthenticationSuccess)
-    ctx.channel().pipeline().get(classOf[CancelableReadTimeoutHandler]).disable()
+  def sendPacket(packet: Packet) = this.getChannelContext.writeAndFlush(packet)
+
+  def closeConnection(reason: String): ChannelFuture = {
+    this.sendPacket(new PacketCloseConnection(reason))
+    this.handshaker.close(this.getChannelContext.channel(), new CloseWebSocketFrame(1000, reason))
   }
-
-  final def getChannelContext = this.ctx
 }

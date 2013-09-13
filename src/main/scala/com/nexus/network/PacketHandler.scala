@@ -14,19 +14,27 @@
  * under the License
  */
 
-package com.nexus.client
+package com.nexus.network
 
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+import com.nexus.network.packet.Packet
+import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
+import com.nexus.concurrent.WorkerPool
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
+class PacketHandler extends SimpleChannelInboundHandler[Packet] {
 
-  private var networkHandler: NetworkHandler = _
+  def channelRead0(ctx: ChannelHandlerContext, packet: Packet){
 
-  def getNetworkHandler = this.networkHandler
+    WorkerPool.execute(new ProcessPacketTask(packet, ctx))
+  }
+
+  class ProcessPacketTask(packet: Packet, ctx: ChannelHandlerContext) extends Runnable{
+    def run(){
+      packet.processPacket(ctx)
+    }
+  }
 }

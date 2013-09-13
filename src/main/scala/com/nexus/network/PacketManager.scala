@@ -17,8 +17,7 @@
 package com.nexus.network
 
 import scala.collection.immutable.HashMap
-import com.nexus.network.packet.Packet
-import com.nexus.network.packet.TestPacket
+import com.nexus.network.packet._
 
 /**
  * No description given
@@ -27,7 +26,10 @@ import com.nexus.network.packet.TestPacket
  */
 object PacketManager {
   private final val packets = HashMap[Int, Class[_ <: Packet]](
-    0x01 -> classOf[TestPacket]
+    0x00 -> classOf[PacketKeepAlive],
+    0x01 -> classOf[PacketAuthenticate],
+    0x02 -> classOf[PacketAuthenticationSuccess],
+    0x03 -> classOf[PacketCloseConnection]
   )
 
   def getPacketID(cl: Class[_ <: Packet]): Int = this.packets.find(p => p._2 == cl).get._1

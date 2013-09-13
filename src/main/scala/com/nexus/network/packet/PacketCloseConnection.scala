@@ -14,19 +14,26 @@
  * under the License
  */
 
-package com.nexus.client
+package com.nexus.network.packet
 
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+import com.nexus.data.json.JsonObject
+import io.netty.channel.ChannelHandlerContext
+import com.nexus.webserver.netty.CancelableReadTimeoutHandler
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
+class PacketCloseConnection(var reason: String) extends Packet {
 
-  private var networkHandler: NetworkHandler = _
-
-  def getNetworkHandler = this.networkHandler
+  def write(data: JsonObject){
+    data.add("reason", this.reason)
+  }
+  def read(data: JsonObject){
+    this.reason = data.get("reason").asString
+  }
+  def processPacket(ctx: ChannelHandlerContext){
+    ctx.channel().pipeline().get("readTimeoutHandler").asInstanceOf[CancelableReadTimeoutHandler].disable()
+  }
 }

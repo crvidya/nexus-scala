@@ -33,19 +33,19 @@ class JsonParser(private final val reader: Reader) {
   private var lineOffset: Int = 0
 
   private[json] def parse: JsonValue = {
-    start
-    skipWhiteSpace
+    start()
+    skipWhiteSpace()
     val result: JsonValue = readValue
-    skipWhiteSpace
+    skipWhiteSpace()
     if(!endOfText) throw this.error("Unexpected character")
-    return result
+    result
   }
 
-  private def start {
+  private def start(){
     line = 1
     offset = -1
     lineOffset = 0
-    read
+    read()
   }
 
   private def readValue: JsonValue =
@@ -61,94 +61,94 @@ class JsonParser(private final val reader: Reader) {
     }
 
   private def readArray: JsonArray = {
-    read
+    read()
     val array: JsonArray = new JsonArray
-    skipWhiteSpace
+    skipWhiteSpace()
     if (readChar(']')) {
       return array
     }
     do {
-      skipWhiteSpace
+      skipWhiteSpace()
       array.add(readValue)
-      skipWhiteSpace
+      skipWhiteSpace()
     } while (readChar(','))
     if (!readChar(']')) {
       throw expected("',' or ']'")
     }
-    return array
+    array
   }
 
   private def readObject: JsonObject = {
-    read
+    read()
     val `object`: JsonObject = new JsonObject
-    skipWhiteSpace
+    skipWhiteSpace()
     if (readChar('}')) {
       return `object`
     }
     do {
-      skipWhiteSpace
+      skipWhiteSpace()
       val name: String = readName
-      skipWhiteSpace
+      skipWhiteSpace()
       if (!readChar(':')) {
         throw expected("':'")
       }
-      skipWhiteSpace
+      skipWhiteSpace()
       `object`.add(name, readValue)
-      skipWhiteSpace
+      skipWhiteSpace()
     } while (readChar(','))
     if (!readChar('}')) {
       throw expected("',' or '}'")
     }
-    return `object`
+    `object`
   }
 
   private def readNull: JsonValue = {
-    read
+    read()
     readRequiredChar('u')
     readRequiredChar('l')
     readRequiredChar('l')
-    return JsonValue.NULL
+    JsonValue.NULL
   }
 
   private def readTrue: JsonValue = {
-    read
+    read()
     readRequiredChar('r')
     readRequiredChar('u')
     readRequiredChar('e')
-    return JsonValue.TRUE
+    JsonValue.TRUE
   }
 
   private def readFalse: JsonValue = {
-    read
+    read()
     readRequiredChar('a')
     readRequiredChar('l')
     readRequiredChar('s')
     readRequiredChar('e')
-    return JsonValue.FALSE
+    JsonValue.FALSE
   }
 
   private def readRequiredChar(ch: Char) = if (!readChar(ch)) throw expected("'" + ch + "'")
   private def readString: JsonValue = {
-    read
+    read()
     recorder.setLength(0)
     while (current != '"') {
       if (current == '\\') {
-        readEscape
+        readEscape()
       }
       else if (current < 0x20) {
         throw expected("valid string character")
       }
       else {
         recorder.append(current.asInstanceOf[Char])
-        read
+        read()
       }
     }
-    read
-    return new JsonString(recorder.toString)
+    read()
+    new JsonString(recorder.toString())
   }
 
-  private def readEscape {
-    read
+  private def readEscape(){
+    read()
     current match {
       case '"' => recorder.append(current.asInstanceOf[Char])
       case '/' => recorder.append(current.asInstanceOf[Char])
@@ -161,7 +161,7 @@ class JsonParser(private final val reader: Reader) {
       case 'u' => {
           val hexChars: Array[Char] = new Array[Char](4)
           for(i <- 0 until 4) {
-            read
+            read()
             if (!JsonParser.isHexDigit(current)) {
               throw expected("hexadecimal digit")
             }
@@ -171,7 +171,7 @@ class JsonParser(private final val reader: Reader) {
         }
       case _ => throw expected("valid escape sequence")
     }
-    read
+    read()
   }
 
   private def readNumber: JsonValue = {
@@ -187,7 +187,7 @@ class JsonParser(private final val reader: Reader) {
     }
     readFraction
     readExponent
-    return new JsonNumber(recorder.toString)
+    new JsonNumber(recorder.toString())
   }
 
   private def readFraction: Boolean = {
@@ -199,7 +199,7 @@ class JsonParser(private final val reader: Reader) {
     }
     while (readAndAppendDigit) {
     }
-    return true
+    true
   }
 
   private def readExponent: Boolean = {
@@ -222,7 +222,7 @@ class JsonParser(private final val reader: Reader) {
       throw expected("name")
     }
     readString
-    recorder.toString
+    recorder.toString()
   }
 
   private def readAndAppendChar(ch: Char): Boolean = {
@@ -230,7 +230,7 @@ class JsonParser(private final val reader: Reader) {
       return false
     }
     recorder.append(ch)
-    read
+    read()
     true
   }
 
@@ -238,20 +238,20 @@ class JsonParser(private final val reader: Reader) {
     if (current != ch) {
       return false
     }
-    read
+    read()
     true
   }
 
   private def readAndAppendDigit: Boolean = {
     if (!JsonParser.isDigit(current)) return false
     recorder.append(current.asInstanceOf[Char])
-    read
+    read()
     true
   }
 
-  private def skipWhiteSpace = while (JsonParser.isWhiteSpace(current) && !endOfText) read
+  private def skipWhiteSpace() = while (JsonParser.isWhiteSpace(current) && !endOfText) read()
 
-  private def read {
+  private def read(){
     if (endOfText) throw error("Unexpected end of input")
     offset += 1
     if (current == '\n') {
@@ -267,7 +267,7 @@ class JsonParser(private final val reader: Reader) {
     if (endOfText) {
       return error("Unexpected end of input")
     }
-    return error("Expected " + expected)
+    error("Expected " + expected)
   }
 
   private def error(message: String) = new ParseException(message, offset, line, offset - lineOffset)

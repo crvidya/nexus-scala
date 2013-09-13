@@ -16,6 +16,10 @@
 
 package com.nexus.network
 
+import scala.collection.mutable
+import io.netty.channel.ChannelHandlerContext
+import com.nexus.network.handlers.NetworkHandler
+
 /**
  * No description given
  *
@@ -23,4 +27,12 @@ package com.nexus.network
  */
 object NetworkRegistry {
 
+  private final val decoderToHandlerClass = mutable.HashMap[String, Class[_ <: NetworkHandler]](
+
+  )
+  private final val ctxToHandlerMap = mutable.HashMap[ChannelHandlerContext, NetworkHandler]()
+
+  def getHandlerClass(decoder: String) = this.decoderToHandlerClass.get(decoder)
+  def addHandler(ctx: ChannelHandlerContext, handler: NetworkHandler) = this.ctxToHandlerMap.put(ctx, handler)
+  def getHandler(ctx: ChannelHandlerContext): Option[NetworkHandler] = this.ctxToHandlerMap.get(ctx)
 }

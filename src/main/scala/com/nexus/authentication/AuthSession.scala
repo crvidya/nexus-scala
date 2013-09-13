@@ -14,19 +14,13 @@
  * under the License
  */
 
-package com.nexus.client
-
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+package com.nexus.authentication
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
+class AuthSession {
 
-  private var networkHandler: NetworkHandler = _
-
-  def getNetworkHandler = this.networkHandler
 }

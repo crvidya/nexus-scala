@@ -20,10 +20,9 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.ChannelInitializer
 import io.netty.handler.ssl.SslHandler
 import io.netty.handler.codec.http._
-import io.netty.handler.stream.ChunkedWriteHandler
 import com.nexus.webserver.SslContextProvider
-import com.nexus.network.codec.WebsocketPacketEncoder
-import io.netty.handler.timeout.ReadTimeoutHandler
+import com.nexus.network.codec.{PacketJsonDecoder, JsonObjectDecoder, JsonObjectEncoder, PacketJsonEncoder}
+import com.nexus.network.PacketHandler
 
 /**
  * TODO: Enter description
@@ -39,18 +38,22 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
       engine.setUseClientMode(false)
       pipe.addLast("ssl", new SslHandler(engine))
     }
-    val readTimeoutHandler = new ReadTimeoutHandler(30)
-    val handler = new WebServerHandler
-    handler.setReadTimeoutHandler(readTimeoutHandler)
+    val readTimeoutHandler = new CancelableReadTimeoutHandler(10)
 
-    pipe.addLast("decoder", new HttpRequestDecoder)
-    pipe.addLast("encoder", new HttpResponseEncoder)
-    //pipe.addLast("deflater", new HttpContentCompressor)
-    //pipe.addLast("inflater", new HttpContentDecompressor)
+    val websocketHandler = new WebSocketHandler
+    val webserverHandler = new WebServerHandler
+    webserverHandler.setWebSocketHandler(websocketHandler)
+    websocketHandler.setReadTimeoutHandler(readTimeoutHandler)
+
+    pipe.addLast("http-codec", new HttpServerCodec)
     pipe.addLast("aggregator", new HttpObjectAggregator(1048576))
-    //pipe.addLast("websocketDecoder", new WebsocketPacketDecoder())
-    pipe.addLast("websocketEncoder", new WebsocketPacketEncoder())
+    pipe.addLast("jsonDecoder", new JsonObjectDecoder)
+    pipe.addLast("jsonEncoder", new JsonObjectEncoder)
+    pipe.addLast("packetJsonDecoder", new PacketJsonDecoder())
+    pipe.addLast("packetJsonEncoder", new PacketJsonEncoder())
+    pipe.addLast("webserverHandler", webserverHandler)
     pipe.addLast("readTimeoutHandler", readTimeoutHandler)
-    pipe.addLast("handler", handler)
+    pipe.addLast("websocketHandler", websocketHandler)
+    pipe.addLast("packetHandler", new PacketHandler)
   }
 }

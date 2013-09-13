@@ -17,12 +17,13 @@
 package com.nexus.client.web
 
 import com.nexus.client.NexusClient
+import com.nexus.authentication.AuthSession
 
 /**
  * No description given
  *
  * @author jk-5
  */
-class NexusClientWebapp extends NexusClient {
+class NexusClientWebapp(_s: AuthSession) extends NexusClient(_s) {
 
 }

@@ -14,19 +14,25 @@
  * under the License
  */
 
-package com.nexus.client
+package com.nexus.network.packet
 
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+import com.nexus.data.json.JsonObject
+import io.netty.channel.ChannelHandlerContext
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
+class PacketKeepAlive extends Packet {
 
-  private var networkHandler: NetworkHandler = _
+  def write(data: JsonObject){
 
-  def getNetworkHandler = this.networkHandler
+  }
+  def read(data: JsonObject){
+
+  }
+  def processPacket(ctx: ChannelHandlerContext){
+
+  }
 }

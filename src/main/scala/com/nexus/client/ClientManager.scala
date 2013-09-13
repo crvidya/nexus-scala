@@ -18,6 +18,8 @@ package com.nexus.client
 
 import scala.collection.immutable.HashMap
 import com.nexus.client.web.NexusClientWebapp
+import scala.collection.mutable
+import com.nexus.authentication.AuthSession
 
 /**
  * No description given
@@ -26,9 +28,17 @@ import com.nexus.client.web.NexusClientWebapp
  */
 object ClientManager {
 
+  private final val clients = mutable.HashSet[NexusClient]()
   private final val clientTypes = HashMap[String, Class[_ <: NexusClient]](
     "webapp" -> classOf[NexusClientWebapp]
   )
 
-
+  def registerClient(typ: String, session: AuthSession): NexusClient = {
+    val clientClass = this.clientTypes.get(typ).getOrElse(null)
+    if(clientClass == null) throw new IllegalArgumentException("Client " + typ + " was not found")
+    val client = clientClass.getConstructor(classOf[AuthSession]).newInstance(session)
+    if(!this.registerClient(client)) throw new RuntimeException("Something went wrong while registering the client")
+    client
+  }
+  def registerClient(client: NexusClient):Boolean = this.clients.add(client)
 }

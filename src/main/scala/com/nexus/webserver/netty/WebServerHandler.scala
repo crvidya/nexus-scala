@@ -28,27 +28,29 @@ import com.nexus.webserver.{WebServerHandlerFactory, TWebServerHandler}
 import io.netty.handler.codec.base64.Base64
 import io.netty.handler.timeout.ReadTimeoutHandler
 
+/*
+TODO: REMOVE ME!
+17:15
+
+Aardappelen 9 -> 5
+Ju 4
+Boontjes laten
+ */
+
+
 /**
  * No description given
  *
  * @author jk-5
  */
-class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
+class WebServerHandler extends SimpleChannelInboundHandler[FullHttpRequest] {
   private var handler: TWebServerHandler = _
   private var request: HttpRequest = _
-  private var readTimeoutHandler: ReadTimeoutHandler = _
+  private var webSocketHandler: WebSocketHandler = _
 
   override def channelReadComplete(ctx: ChannelHandlerContext) = ctx.flush()
 
-  override def channelRead0(ctx: ChannelHandlerContext, msg: AnyRef) = msg match{
-      case m: FullHttpRequest => this.handleHttpRequest(ctx, m)
-      case m: WebSocketFrame => this.handleWebSocketFrame(ctx, m)
-      case m => {
-        //TODO: handle unknown data
-      }
-  }
-
-  def handleHttpRequest(ctx: ChannelHandlerContext, req: FullHttpRequest) =
+  override def channelRead0(ctx: ChannelHandlerContext, req: FullHttpRequest){
     if(!req.getDecoderResult.isSuccess) this.sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST))
     else{
       if(req.headers().contains(HttpHeaders.Names.AUTHORIZATION)){
@@ -74,18 +76,12 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
         if(!HttpHeaders.isKeepAlive(req) || res.getStatus.code() != 200) f.addListener(ChannelFutureListener.CLOSE)
       }
     }
+  }
 
   override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
     if(cause.isInstanceOf[NotSslRecordException]){
       //this.sendRedirect(ctx, )
       //TODO: redirect to SSL
-    }
-  }
-
-  private def handleWebSocketFrame(ctx: ChannelHandlerContext, frame: WebSocketFrame) = this.handler match{
-    case h: WebServerHandlerWebsocket => h.handleWebSocketFrame(ctx, frame)
-    case h => {
-      //TODO: handle this
     }
   }
 
@@ -106,6 +102,6 @@ class WebServerHandler extends SimpleChannelInboundHandler[AnyRef] {
     ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE)
   }
 
-  def setReadTimeoutHandler(handler: ReadTimeoutHandler) = this.readTimeoutHandler = handler
-  def getReadTimeoutHandler = this.readTimeoutHandler
+  def setWebSocketHandler(handler: WebSocketHandler) = this.webSocketHandler = handler
+  def getWebSocketHandler = this.webSocketHandler
 }

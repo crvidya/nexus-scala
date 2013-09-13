@@ -14,19 +14,17 @@
  * under the License
  */
 
-package com.nexus.client
+package com.nexus.network.packet
 
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+import com.nexus.data.json.JsonObject
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
-
-  private var networkHandler: NetworkHandler = _
-
-  def getNetworkHandler = this.networkHandler
+abstract class EmptyPayloadPacket extends Packet {
+  final def write(o: JsonObject){}
+  final def read(o: JsonObject){}
+  override final def hasData = false
 }

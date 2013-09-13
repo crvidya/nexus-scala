@@ -14,19 +14,22 @@
  * under the License
  */
 
-package com.nexus.client
+package com.nexus.network.codec
 
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+import io.netty.handler.codec.MessageToMessageEncoder
+import io.netty.channel.ChannelHandlerContext
+import java.util
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
+import com.nexus.data.json.JsonObject
 
 /**
- * No description given
+ * Encodes an JsonObject into an TextWebSocketFrame
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
+class JsonObjectEncoder extends MessageToMessageEncoder[JsonObject] {
 
-  private var networkHandler: NetworkHandler = _
-
-  def getNetworkHandler = this.networkHandler
+  override def encode(ctx: ChannelHandlerContext, data: JsonObject, out: util.List[AnyRef]){
+    out.add(new TextWebSocketFrame(data.toString))
+  }
 }

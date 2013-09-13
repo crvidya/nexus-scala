@@ -14,22 +14,22 @@
  * under the License
  */
 
-package com.nexus.network.handlers
+package com.nexus.webserver.netty
 
-import com.nexus.network.packet.Packet
+import io.netty.channel.ChannelHandlerContext
+import io.netty.handler.timeout.ReadTimeoutHandler
 
 /**
  * No description given
  *
  * @author jk-5
  */
-class NetworkHandlerConnect extends NetworkHandler {
+class CancelableReadTimeoutHandler(seconds: Int) extends ReadTimeoutHandler(seconds) {
 
-  def identify(){
+  private var enabled = true
 
-  }
+  def disable() = this.enabled = false
+  def enable() = this.enabled = true
 
-  def sendPacket(packet: Packet){
-
-  }
+  override protected def readTimedOut(ctx: ChannelHandlerContext) = if(this.enabled) super.readTimedOut(ctx)
 }

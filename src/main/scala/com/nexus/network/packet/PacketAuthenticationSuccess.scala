@@ -14,19 +14,15 @@
  * under the License
  */
 
-package com.nexus.client
+package com.nexus.network.packet
 
-import com.nexus.network.handlers.NetworkHandler
-import com.nexus.authentication.AuthSession
+import io.netty.channel.ChannelHandlerContext
 
 /**
  * No description given
  *
  * @author jk-5
  */
-abstract class NexusClient(private final val session: AuthSession) {
-
-  private var networkHandler: NetworkHandler = _
-
-  def getNetworkHandler = this.networkHandler
+class PacketAuthenticationSuccess extends EmptyPayloadPacket {
+  def processPacket(ctx: ChannelHandlerContext) = {}
 }
