@@ -16,24 +16,20 @@
 
 package com.nexus.webserver
 
-import com.google.common.collect.Maps
-import java.util.{Map => JMap, List => JList}
-import com.nexus.traits.TLoader
 import com.nexus.webserver.handlers.{WebServerHandlerTest, WebServerHandlerWebsocket, WebServerHandlerHtml}
-import com.nexus.logging.NexusLog
+import scala.collection.immutable
 
 /**
  * No description given
  *
  * @author jk-5
  */
-object WebServerHandlerRegistry extends TLoader {
-  private final val handlers: JMap[String, TWebServerHandler] = Maps.newLinkedHashMap()
+object WebServerHandlerRegistry {
+
+  private final val handlers = immutable.HashMap[String, TWebServerHandler](
+    "/websocket/" -> new WebServerHandlerWebsocket("/websocket"),
+    "/test/(.*)" -> new WebServerHandlerTest,
+    "/(.*)" -> new WebServerHandlerHtml
+  )
   def getHandlers = this.handlers
-  override def load{
-    this.handlers.put("/websocket/", new WebServerHandlerWebsocket("/websocket"))
-    this.handlers.put("/test/(.*)", new WebServerHandlerTest)
-    this.handlers.put("/(.*)", new WebServerHandlerHtml)
-    NexusLog.info("Registered %d webserver handler%s".format(this.handlers.size(), if(this.handlers.size() != 1) "s"))
-  }
 }

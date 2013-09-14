@@ -16,7 +16,7 @@
 
 package com.nexus.network.handlers
 
-import com.nexus.network.packet.{PacketAuthenticationSuccess, Packet}
+import com.nexus.network.packet.{PacketCloseConnection, PacketAuthenticationSuccess, Packet}
 import io.netty.channel.{ChannelFuture, ChannelHandlerContext}
 import com.nexus.webserver.netty.CancelableReadTimeoutHandler
 
@@ -27,8 +27,11 @@ import com.nexus.webserver.netty.CancelableReadTimeoutHandler
  */
 abstract class NetworkHandler(private final val ctx: ChannelHandlerContext) {
 
-  def sendPacket(packet: Packet)
-  def closeConnection(reason: String): ChannelFuture
+  def sendPacket(packet: Packet) = this.ctx.writeAndFlush(packet)
+  def closeConnection(reason: String): ChannelFuture = {
+    this.sendPacket(new PacketCloseConnection(reason))
+    this.ctx.close()
+  }
   def closeConnection(): ChannelFuture = this.closeConnection("No reason given")
   private def onHandlerRegistered() = {}
 
@@ -40,3 +43,5 @@ abstract class NetworkHandler(private final val ctx: ChannelHandlerContext) {
 
   final def getChannelContext = this.ctx
 }
+
+class DummyNetworkHandler(_ctx: ChannelHandlerContext) extends NetworkHandler(_ctx)

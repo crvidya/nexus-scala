@@ -14,11 +14,17 @@
  * under the License
  */
 
-package com.nexus.plugin
+package com.nexus.time.synchronisation
 
-import java.util.{List => JList}
+import java.util.Date
 
-object PluginContainerBuilder {
-
-	def getContainers(classes:String):JList[PluginContainer] = null
+/**
+ * No description given
+ *
+ * @author jk-5
+ */
+class TimeSynchroniserInternal extends TimeSynchroniser {
+  def getCurrentDate: Date = new Date()
+  def getCurrentTime: Long = System.currentTimeMillis()
+  def synchronise() = {}
 }

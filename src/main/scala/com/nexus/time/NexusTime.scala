@@ -16,11 +16,20 @@
 
 package com.nexus.time
 
+import java.util.{Calendar, Date}
+import com.nexus.time.synchronisation.TimeSynchronisationHandler
+
 /**
  * No description given
  *
  * @author jk-5
  */
 object NexusTime {
-
+  def getCurrentDate: Date = TimeSynchronisationHandler.getCurrentDate
+  def getCurrentTime: Long = TimeSynchronisationHandler.getCurrentTime
+  def getCalendar: Calendar = {
+    val ret = Calendar.getInstance()
+    ret.setTime(this.getCurrentDate)
+    ret
+  }
 }

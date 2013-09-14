@@ -33,13 +33,15 @@ class WebSocketHandler extends SimpleChannelInboundHandler[WebSocketFrame] {
   private var readTimeoutHandler: CancelableReadTimeoutHandler = _
   private var handshaker: WebSocketServerHandshaker = _
 
-  override def channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame){
-    msg match {
-      case t: TextWebSocketFrame => //TODO: This is invalid data! Handle it!
-      case f: CloseWebSocketFrame => NetworkRegistry.getHandler(ctx).get.closeConnection("Client requested disconnect")
-      case f: PingWebSocketFrame => ctx.channel().write(new PongWebSocketFrame(f.content().retain()))
-      case f => throw new UnsupportedOperationException("%s frame types not supported".format(msg.getClass.getName))
+  override def channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) = msg match {
+    case t: TextWebSocketFrame => //TODO: This is invalid data! Handle it!
+    case f: CloseWebSocketFrame => {
+      val handler = NetworkRegistry.getHandler(ctx)
+      if(handler.isEmpty) return
+      handler.get.closeConnection("Client requested disconnect")
     }
+    case f: PingWebSocketFrame => ctx.channel().write(new PongWebSocketFrame(f.content().retain()))
+    case f => throw new UnsupportedOperationException("%s frame types not supported".format(msg.getClass.getName))
   }
 
   override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) = cause match{

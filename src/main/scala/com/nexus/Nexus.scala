@@ -16,34 +16,30 @@
 
 package com.nexus
 
-import com.google.common.collect.Lists
-import java.util.{List => JList}
 import com.nexus.traits.TLoader
-import scala.collection.JavaConversions._
 import com.nexus.logging.NexusLog
 import com.nexus.webserver.{WebServerHandlerRegistry, SslContextProvider}
 import com.nexus.webserver.netty.WebServer
 import java.io.File
 import com.nexus.data.config.ConfigFile
-import com.nexus.event.EventBus
-import com.nexus.event.events.ServerStartedEvent
 import com.nexus.time.ticks.Timer
 import com.nexus.concurrent.WorkerPool
 import com.nexus.data.couchdb.CouchDB
+import com.nexus.time.synchronisation.TimeSynchronisationHandler
 
 object Nexus {
 
-  private final val EVENT_BUS = new EventBus()
-	private final val loaders:JList[TLoader] = Lists.newArrayList()
   private final val CONFIG_DIR = new File("config")
   private var config: ConfigFile = null
+  private final val loaders = Array[TLoader](
+    WorkerPool,
+    CouchDB,
+    TimeSynchronisationHandler,
+    LoadClass(WebServerHandlerRegistry),
+    SslContextProvider,
+    WebServer
+  )
 
-  this.loaders.add(WorkerPool)
-  this.loaders.add(CouchDB)
-  this.loaders.add(WebServerHandlerRegistry)
-	this.loaders.add(SslContextProvider)
-	this.loaders.add(WebServer)
-	
 	def start(){
 		NexusLog.info("Starting nexus-scala, version %s (build %d)".format(Version.version, Version.build))
 
@@ -53,11 +49,16 @@ object Nexus {
     Timer.startTimer()
 
 		this.loaders.foreach(l=>l.load())
-
-    this.getEventBus.post(new ServerStartedEvent)
 	}
 
   def getConfig = this.config
-  def getEventBus = this.EVENT_BUS
   def getTimer = Timer
+}
+
+object LoadClass {
+  def apply(toload: Any): LoadClass = new LoadClass(toload)
+}
+
+class LoadClass(toLoad: Any) extends TLoader {
+  def load() = toLoad.getClass
 }

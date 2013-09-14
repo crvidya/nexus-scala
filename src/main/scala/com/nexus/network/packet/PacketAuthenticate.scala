@@ -17,11 +17,9 @@
 package com.nexus.network.packet
 
 import com.nexus.data.json.JsonObject
-import com.nexus.logging.NexusLog
 import io.netty.channel.ChannelHandlerContext
-import com.nexus.webserver.netty.CancelableReadTimeoutHandler
 import com.nexus.network.NetworkRegistry
-import com.nexus.network.handlers.NetworkHandlerWebsocket
+import com.nexus.network.handlers.{DummyNetworkHandler, NetworkHandler}
 
 /**
  * No description given
@@ -38,17 +36,14 @@ class PacketAuthenticate extends Packet {
   def read(data: JsonObject){
     this.data = data.get("secret").asString
   }
-  def processPacket(ctx: ChannelHandlerContext){
+  def processPacket(handler: NetworkHandler){
     //TODO: Authenticate it!
-    println("0x01")
-    if(NetworkRegistry.getHandler(ctx).getOrElse(null) == null){
-      val handlerClass = NetworkRegistry.getHandlerClass(this.getDecoder).getOrElse(null)
-      println("going")
-      if(handlerClass == null) return //TODO: Handle this!
-      val handler = handlerClass.getConstructor(classOf[ChannelHandlerContext]).newInstance(ctx)
-      NetworkRegistry.addHandler(ctx, handler)
-      handler.handlerRegistered()
-      println("done")
+    if(handler.isInstanceOf[DummyNetworkHandler]){
+      val handlerClass = NetworkRegistry.getHandlerClass(this.getDecoder)
+      if(handlerClass.isEmpty) return //TODO: Handle this!
+      val newHandler = handlerClass.get.getConstructor(classOf[ChannelHandlerContext]).newInstance(handler.getChannelContext)
+      NetworkRegistry.addHandler(newHandler)
+      newHandler.handlerRegistered()
     }
   }
 }

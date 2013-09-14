@@ -22,7 +22,6 @@ import java.io.Serializable
 import java.io.StringReader
 import java.io.StringWriter
 import java.io.Writer
-import com.google.common.base.Throwables
 
 object JsonValue {
   final val TRUE = new JsonLiteral("true")
@@ -34,7 +33,7 @@ object JsonValue {
     try {
       new JsonParser(new StringReader(text)).parse
     }catch{
-      case e: IOException => throw Throwables.propagate(e)
+      case e: IOException => throw new RuntimeException(e)
     }
   def valueOf(value: Int) = new JsonNumber(value.toString)
   def valueOf(value: Long) = new JsonNumber(value.toString)

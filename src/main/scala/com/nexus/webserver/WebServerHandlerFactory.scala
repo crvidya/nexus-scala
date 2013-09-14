@@ -19,10 +19,10 @@ package com.nexus.webserver
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http._
 import java.util
-import com.google.common.collect.Lists
 import com.nexus.util.Utils
 import java.util.regex.Pattern
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
 
 /**
  * No description given
@@ -33,7 +33,7 @@ object WebServerHandlerFactory {
   def handleRequest(ctx: ChannelHandlerContext, req: FullHttpRequest): TWebServerHandler = {
     try{
       var handler:TWebServerHandler = null
-      val args: util.List[String] = Lists.newArrayList()
+      val args = ListBuffer[String]()
       var breakIterator = false
       for(e: util.Map.Entry[String, TWebServerHandler] <- WebServerHandlerRegistry.getHandlers.entrySet() if !breakIterator){
         var path = Utils.sanitizeURI(req.getUri)
@@ -45,7 +45,7 @@ object WebServerHandlerFactory {
           while(!breakLoop) try{
             val res = path.replaceAll(e.getKey, "$" + i)
             if(res.equals("$" + i)) breakLoop = true
-            args.add(res)
+            args += res
             i += 1
           }catch{
             case e:IndexOutOfBoundsException => breakLoop = true

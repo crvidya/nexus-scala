@@ -18,11 +18,8 @@ package com.nexus.data.json
 
 import java.io.ObjectInputStream
 import java.io.Reader
-import java.util
-import java.util.Collections
-import java.lang.Iterable
-import com.google.common.collect.Lists
 import com.nexus.webserver.TWebServerResponse
+import scala.collection.mutable.ListBuffer
 
 object JsonObject {
   def readFrom(reader: Reader) = JsonValue.readFrom(reader).asObject
@@ -72,8 +69,8 @@ object JsonObject {
 }
 
 class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebServerResponse{
-  private final val names: util.List[String] = Lists.newArrayList()
-  private final val values: util.List[JsonValue] = Lists.newArrayList()
+  private final val names = ListBuffer[String]()
+  private final val values = ListBuffer[JsonValue]()
   @transient
   private var table: JsonObject.HashIndexTable = new JsonObject.HashIndexTable
 
@@ -111,8 +108,8 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebSer
     if(name == null) throw new NullPointerException("Name is null")
     if(value == null) throw new NullPointerException("Value is null")
     table.add(name, this.names.size)
-    names.add(name)
-    values.add(value)
+    names += name
+    values += value
     this
   }
 
@@ -150,11 +147,11 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebSer
     if(name == null) throw new NullPointerException("Name is null")
     if(value == null) throw new NullPointerException("Value is null")
     val index: Int = this.indexOf(name)
-    if(index != -1) values.set(index, value)
+    if(index != -1) values.update(index, value)
     else{
       table.add(name, names.size)
-      names.add(name)
-      values.add(value)
+      names += name
+      values += value
     }
     this
   }
@@ -173,21 +170,21 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebSer
   def get(name: String): JsonValue = {
     if(name == null) throw new NullPointerException("Name is null")
     val index: Int = this.indexOf(name)
-    if (index != -1) values.get(index) else null
+    if (index != -1) values(index) else null
   }
 
-  def size = names.size
-  def isEmpty = names.isEmpty
-  def getNames = Collections.unmodifiableList(this.names)
+  override def size = names.size
+  override def isEmpty = names.isEmpty
+  def getNames = this.names.toList
 
-  def iterator: util.Iterator[JsonObject.Member] = {
-    val namesIterator: util.Iterator[String] = this.names.iterator
-    val valuesIterator: util.Iterator[JsonValue] = values.iterator
-    new util.Iterator[JsonObject.Member] {
+  def iterator: Iterator[JsonObject.Member] = {
+    val namesIterator = this.names.iterator
+    val valuesIterator = this.values.iterator
+    new Iterator[JsonObject.Member] {
       def hasNext = namesIterator.hasNext
-      def next: JsonObject.Member = {
-        val name: String = namesIterator.next
-        val value: JsonValue = valuesIterator.next
+      def next(): JsonObject.Member = {
+        val name: String = namesIterator.next()
+        val value: JsonValue = valuesIterator.next()
         new JsonObject.Member(name, value)
       }
       def remove = throw new UnsupportedOperationException
@@ -205,24 +202,24 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebSer
 
   private[json] def indexOf(name: String): Int = {
     val index: Int = table.get(name)
-    if (index != -1 && (name == names.get(index))) {
+    if (index != -1 && (name == names(index))) {
       return index
     }
     names.lastIndexOf(name)
   }
 
   private def readObject(inputStream: ObjectInputStream) {
-    inputStream.defaultReadObject
+    inputStream.defaultReadObject()
     table = new JsonObject.HashIndexTable
-    updateHashIndex
+    updateHashIndex()
   }
 
-  private def updateHashIndex = for(i <- 0 until names.size) table.add(names.get(i), i)
+  private def updateHashIndex() = for(i <- 0 until names.size) table.add(names(i), i)
 
   def addError(desc: String): JsonObject = {
     this.add("error", desc)
     this
   }
-  def getResponseData: String = this.toString
+  def getResponseData: String = this.toString()
   def getMimeType = "application/json"
 }

@@ -17,8 +17,7 @@
 package com.nexus.network.packet
 
 import com.nexus.data.json.JsonObject
-import io.netty.channel.ChannelHandlerContext
-import com.nexus.webserver.netty.CancelableReadTimeoutHandler
+import com.nexus.network.handlers.NetworkHandler
 
 /**
  * No description given
@@ -33,7 +32,7 @@ class PacketCloseConnection(var reason: String) extends Packet {
   def read(data: JsonObject){
     this.reason = data.get("reason").asString
   }
-  def processPacket(ctx: ChannelHandlerContext){
-    ctx.channel().pipeline().get("readTimeoutHandler").asInstanceOf[CancelableReadTimeoutHandler].disable()
+  def processPacket(handler: NetworkHandler){
+    handler.closeConnection(this.reason)
   }
 }

@@ -27,10 +27,13 @@ import com.nexus.traits.TLoader
  * @author jk-5
  */
 object WorkerPool extends TLoader {
-  private var pool: ExecutorService = _
+  private var pool: ScheduledExecutorService = _
   def execute(r: Runnable) = this.pool.execute(r)
   def submit[T](c: Callable[T]): Future[T] = this.pool.submit(c)
-  def load() = this.pool = Executors.newFixedThreadPool(Nexus.getConfig.getTag("numberOfWorkers").setComment("The number of worker threads that will be used for all kinds of async tasks").getIntValue(4), WorkerThreadFactory)
+  def schedule(r: Runnable, delay: Long, unit: TimeUnit) = this.pool.schedule(r, delay, unit)
+  def schedule[T](c: Callable[T], delay: Long, unit: TimeUnit) = this.pool.schedule(c, delay, unit)
+  def scheduleWithInterval(r: Runnable, initialDelay: Long, interval: Long, unit: TimeUnit) = this.pool.scheduleAtFixedRate(r, initialDelay, interval, unit)
+  def load() = this.pool = Executors.newScheduledThreadPool(Nexus.getConfig.getTag("numberOfWorkers").setComment("The number of worker threads that will be used for all kinds of async tasks").getIntValue(4), WorkerThreadFactory)
 }
 
 object WorkerThreadFactory extends ThreadFactory {

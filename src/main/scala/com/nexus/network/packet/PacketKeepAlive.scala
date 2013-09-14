@@ -17,7 +17,7 @@
 package com.nexus.network.packet
 
 import com.nexus.data.json.JsonObject
-import io.netty.channel.ChannelHandlerContext
+import com.nexus.network.handlers.NetworkHandler
 
 /**
  * No description given
@@ -32,7 +32,7 @@ class PacketKeepAlive extends Packet {
   def read(data: JsonObject){
 
   }
-  def processPacket(ctx: ChannelHandlerContext){
+  def processPacket(handler: NetworkHandler){
 
   }
 }

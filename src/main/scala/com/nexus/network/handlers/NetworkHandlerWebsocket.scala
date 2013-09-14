@@ -16,7 +16,7 @@
 
 package com.nexus.network.handlers
 
-import com.nexus.network.packet.{PacketCloseConnection, Packet}
+import com.nexus.network.packet.PacketCloseConnection
 import io.netty.handler.codec.http.websocketx.{CloseWebSocketFrame, WebSocketServerHandshaker}
 import io.netty.channel.{ChannelFuture, ChannelHandlerContext}
 import com.nexus.webserver.netty.WebSocketHandler
@@ -30,9 +30,7 @@ class NetworkHandlerWebsocket(_ctx: ChannelHandlerContext) extends NetworkHandle
 
   private val handshaker: WebSocketServerHandshaker = this.getChannelContext.channel().pipeline().get(classOf[WebSocketHandler]).getHandshaker
 
-  def sendPacket(packet: Packet) = this.getChannelContext.writeAndFlush(packet)
-
-  def closeConnection(reason: String): ChannelFuture = {
+  override def closeConnection(reason: String): ChannelFuture = {
     this.sendPacket(new PacketCloseConnection(reason))
     this.handshaker.close(this.getChannelContext.channel(), new CloseWebSocketFrame(1000, reason))
   }

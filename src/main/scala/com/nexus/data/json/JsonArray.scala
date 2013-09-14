@@ -17,12 +17,9 @@
 package com.nexus.data.json
 
 import java.io.Reader
-import java.util.Collections
-import java.util
-import java.lang.Iterable
-import com.google.common.collect.Lists
 import com.nexus.webserver.TWebServerResponse
-import scala.collection.JavaConversions._
+import java.util
+import scala.collection.mutable.ListBuffer
 
 object JsonArray {
   def readFrom(reader: Reader) = JsonValue.readFrom(reader).asArray
@@ -47,102 +44,98 @@ object JsonArray {
 
 class JsonArray extends JsonValue with Iterable[JsonValue] with TWebServerResponse {
 
-  private final val values: util.List[JsonValue] = Lists.newArrayList()
+  private final val values = ListBuffer[JsonValue]()
 
   def add(value: Int): JsonArray = {
-    this.values.add(JsonValue.valueOf(value))
+    this.values += JsonValue.valueOf(value)
     this
   }
 
   def add(value: Long): JsonArray = {
-    this.values.add(JsonValue.valueOf(value))
+    this.values += JsonValue.valueOf(value)
     this
   }
 
   def add(value: Float): JsonArray = {
-    this.values.add(JsonValue.valueOf(value))
+    this.values += JsonValue.valueOf(value)
     this
   }
 
   def add(value: Double): JsonArray = {
-    this.values.add(JsonValue.valueOf(value))
+    this.values += JsonValue.valueOf(value)
     this
   }
 
   def add(value: Boolean): JsonArray = {
-    this.values.add(JsonValue.valueOf(value))
+    this.values += JsonValue.valueOf(value)
     this
   }
 
   def add(value: String): JsonArray = {
-    this.values.add(JsonValue.valueOf(value))
+    this.values += JsonValue.valueOf(value)
     this
   }
 
   def add(value: JsonValue): JsonArray = {
-    if (value == null) {
-      throw new NullPointerException("value is null")
-    }
-    this.values.add(value)
+    if(value == null) throw new NullPointerException("value is null")
+    this.values += value
     this
   }
 
   def set(index: Int, value: Long): JsonArray = {
-    this.values.set(index, JsonValue.valueOf(value))
+    this.values.update(index, JsonValue.valueOf(value))
     this
   }
 
   def set(index: Int, value: Float): JsonArray = {
-    this.values.set(index, JsonValue.valueOf(value))
+    this.values.update(index, JsonValue.valueOf(value))
     this
   }
 
   def set(index: Int, value: Double): JsonArray = {
-    this.values.set(index, JsonValue.valueOf(value))
+    this.values.update(index, JsonValue.valueOf(value))
     this
   }
 
   def set(index: Int, value: Boolean): JsonArray = {
-    this.values.set(index, JsonValue.valueOf(value))
+    this.values.update(index, JsonValue.valueOf(value))
     this
   }
 
   def set(index: Int, value: String): JsonArray = {
-    this.values.set(index, JsonValue.valueOf(value))
+    this.values.update(index, JsonValue.valueOf(value))
     this
   }
 
   def set(index: Int, value: JsonValue): JsonArray = {
-    if (value == null) {
-      throw new NullPointerException("value is null")
-    }
-    this.values.set(index, value)
+    if(value == null) throw new NullPointerException("value is null")
+    this.values.update(index, value)
     this
   }
 
-  def size: Int = this.values.size
-  def isEmpty: Boolean = this.values.isEmpty
+  override def size: Int = this.values.size
+  override def isEmpty: Boolean = this.values.isEmpty
 
-  def get(index: Int): JsonValue = this.values.get(index)
-  def getValues = Collections.unmodifiableList(this.values)
+  def get(index: Int): JsonValue = this.values(index)
+  def getValues = this.values.toList
 
-  def iterator: util.Iterator[JsonValue] = {
-    val iterator: util.Iterator[JsonValue] = this.values.iterator
-    new util.Iterator[JsonValue] {
+  def iterator: Iterator[JsonValue] = {
+    val iterator: Iterator[JsonValue] = this.values.iterator
+    new Iterator[JsonValue] {
       def hasNext: Boolean = iterator.hasNext
-      def next: JsonValue = iterator.next
+      def next(): JsonValue = iterator.next()
       def remove() = throw new UnsupportedOperationException
     }
   }
   private [json] def write(writer: JsonWriter) = writer.writeArray(this)
   override def isArray = true
   override def asArray = this
-  override def hashCode = this.values.hashCode
+  override def hashCode = this.values.hashCode()
   override def equals(obj: Any): Boolean =
     if(obj == null) false
     else if(this.getClass ne obj.getClass) false
     else this.values == obj.asInstanceOf[JsonArray].values
 
-  def getResponseData: String = this.toString
+  def getResponseData: String = this.toString()
   def getMimeType = "application/json"
 }

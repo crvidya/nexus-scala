@@ -16,7 +16,7 @@
 
 package com.nexus.network.packet
 
-import io.netty.channel.ChannelHandlerContext
+import com.nexus.network.handlers.NetworkHandler
 
 /**
  * No description given
@@ -24,5 +24,5 @@ import io.netty.channel.ChannelHandlerContext
  * @author jk-5
  */
 class PacketAuthenticationSuccess extends EmptyPayloadPacket {
-  def processPacket(ctx: ChannelHandlerContext) = {}
+  def processPacket(handler: NetworkHandler) = {}
 }
