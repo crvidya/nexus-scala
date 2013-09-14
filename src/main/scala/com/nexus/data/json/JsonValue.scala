@@ -22,6 +22,7 @@ import java.io.Serializable
 import java.io.StringReader
 import java.io.StringWriter
 import java.io.Writer
+import com.nexus.webserver.TWebServerResponse
 
 object JsonValue {
   final val TRUE = new JsonLiteral("true")
@@ -46,7 +47,7 @@ object JsonValue {
     else string
 }
 
-abstract class JsonValue extends Serializable {
+abstract class JsonValue extends Serializable with TWebServerResponse {
 
   def isObject = false
   def isArray = false
@@ -57,17 +58,17 @@ abstract class JsonValue extends Serializable {
   def isFalse = false
   def isNull = false
 
-  def asObject: JsonObject = throw new UnsupportedOperationException("Not an object: " + toString)
-  def asArray: JsonArray = throw new UnsupportedOperationException("Not an array: " + toString)
-  def asInt: Int = throw new UnsupportedOperationException("Not a number: " + toString)
-  def asLong: Long = throw new UnsupportedOperationException("Not a number: " + toString)
-  def asFloat: Float = throw new UnsupportedOperationException("Not a number: " + toString)
-  def asDouble: Double = throw new UnsupportedOperationException("Not a number: " + toString)
-  def asString: String = throw new UnsupportedOperationException("Not a string: " + toString)
-  def asBoolean: Boolean = throw new UnsupportedOperationException("Not a boolean: " + toString)
+  def asObject: JsonObject = throw new UnsupportedOperationException("Not an object: " + this.stringify)
+  def asArray: JsonArray = throw new UnsupportedOperationException("Not an array: " + this.stringify)
+  def asInt: Int = throw new UnsupportedOperationException("Not a number: " + this.stringify)
+  def asLong: Long = throw new UnsupportedOperationException("Not a number: " + this.stringify)
+  def asFloat: Float = throw new UnsupportedOperationException("Not a number: " + this.stringify)
+  def asDouble: Double = throw new UnsupportedOperationException("Not a number: " + this.stringify)
+  def asString: String = throw new UnsupportedOperationException("Not a string: " + this.stringify)
+  def asBoolean: Boolean = throw new UnsupportedOperationException("Not a boolean: " + this.stringify)
 
   def writeTo(writer: Writer) = this.write(new JsonWriter(writer))
-  override def toString: String = {
+  def stringify: String = {
     val stringWriter: StringWriter = new StringWriter
     val jsonWriter: JsonWriter = new JsonWriter(stringWriter)
     try{
@@ -80,4 +81,7 @@ abstract class JsonValue extends Serializable {
 
   override def hashCode = super.hashCode
   private [json] def write(writer: JsonWriter)
+
+  def getMimeType = "application/json"
+  def getResponseData: String = this.stringify
 }

@@ -16,9 +16,7 @@
 
 package com.nexus.data.json
 
-import java.io.ObjectInputStream
 import java.io.Reader
-import com.nexus.webserver.TWebServerResponse
 import scala.collection.mutable.ListBuffer
 
 object JsonObject {
@@ -68,11 +66,10 @@ object JsonObject {
   }
 }
 
-class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebServerResponse{
+class JsonObject extends JsonValue with Iterable[JsonObject.Member]{
   private final val names = ListBuffer[String]()
   private final val values = ListBuffer[JsonValue]()
-  @transient
-  private var table: JsonObject.HashIndexTable = new JsonObject.HashIndexTable
+  @transient private final val table: JsonObject.HashIndexTable = new JsonObject.HashIndexTable
 
   def add(name: String, value: Int): JsonObject = {
     this.add(name, JsonValue.valueOf(value))
@@ -208,18 +205,8 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member] with TWebSer
     names.lastIndexOf(name)
   }
 
-  private def readObject(inputStream: ObjectInputStream) {
-    inputStream.defaultReadObject()
-    table = new JsonObject.HashIndexTable
-    updateHashIndex()
-  }
-
-  private def updateHashIndex() = for(i <- 0 until names.size) table.add(names(i), i)
-
   def addError(desc: String): JsonObject = {
     this.add("error", desc)
     this
   }
-  def getResponseData: String = this.toString()
-  def getMimeType = "application/json"
 }

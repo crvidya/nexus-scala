@@ -16,8 +16,8 @@
 
 package com.nexus.webserver
 
-import com.nexus.webserver.handlers.{WebServerHandlerTest, WebServerHandlerWebsocket, WebServerHandlerHtml}
-import scala.collection.immutable
+import com.nexus.webserver.handlers._
+import scala.collection.mutable
 
 /**
  * No description given
@@ -26,7 +26,7 @@ import scala.collection.immutable
  */
 object WebServerHandlerRegistry {
 
-  private final val handlers = immutable.HashMap[String, TWebServerHandler](
+  private final val handlers = mutable.LinkedHashMap[String, TWebServerHandler](
     "/websocket/" -> new WebServerHandlerWebsocket("/websocket"),
     "/test/(.*)" -> new WebServerHandlerTest,
     "/(.*)" -> new WebServerHandlerHtml

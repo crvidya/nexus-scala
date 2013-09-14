@@ -22,7 +22,6 @@ import com.nexus.webserver.{WebServerHandlerRegistry, SslContextProvider}
 import com.nexus.webserver.netty.WebServer
 import java.io.File
 import com.nexus.data.config.ConfigFile
-import com.nexus.time.ticks.Timer
 import com.nexus.concurrent.WorkerPool
 import com.nexus.data.couchdb.CouchDB
 import com.nexus.time.synchronisation.TimeSynchronisationHandler
@@ -46,13 +45,10 @@ object Nexus {
     if(!this.CONFIG_DIR.exists()) this.CONFIG_DIR.mkdirs()
     this.config = new ConfigFile(new File(this.CONFIG_DIR, "Nexus.cfg")).setComment("Nexus main configuration file")
 
-    Timer.startTimer()
-
 		this.loaders.foreach(l=>l.load())
 	}
 
   def getConfig = this.config
-  def getTimer = Timer
 }
 
 object LoadClass {

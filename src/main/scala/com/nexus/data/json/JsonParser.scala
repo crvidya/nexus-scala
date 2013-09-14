@@ -131,7 +131,7 @@ class JsonParser(private final val reader: Reader) {
   private def readString: JsonValue = {
     read()
     recorder.setLength(0)
-    while (current != '"') {
+    while (current != '"') { //IntelliJ complains about current not being updated. It is! Ignore that!
       if (current == '\\') {
         readEscape()
       }

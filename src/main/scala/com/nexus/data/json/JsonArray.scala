@@ -17,32 +17,14 @@
 package com.nexus.data.json
 
 import java.io.Reader
-import com.nexus.webserver.TWebServerResponse
-import java.util
 import scala.collection.mutable.ListBuffer
 
 object JsonArray {
   def readFrom(reader: Reader) = JsonValue.readFrom(reader).asArray
   def readFrom(string: String) = JsonValue.readFrom(string).asArray
-  implicit def asJsonArray(c: util.Collection[_]): JsonArray = {
-    val a = new JsonArray
-    for(o <- c){
-      o match{
-        case i: Int => a.add(i)
-        case l: Long => a.add(l)
-        case f: Float => a.add(f)
-        case d: Double => a.add(d)
-        case b: Boolean => a.add(b)
-        case s: String => a.add(s)
-        case v: JsonValue => a.add(v)
-        case e => throw new RuntimeException("Unsupported conversion, from %s to JsonValue".format(e.getClass.getSimpleName))
-      }
-    }
-    a
-  }
 }
 
-class JsonArray extends JsonValue with Iterable[JsonValue] with TWebServerResponse {
+class JsonArray extends JsonValue with Iterable[JsonValue] {
 
   private final val values = ListBuffer[JsonValue]()
 
@@ -135,7 +117,4 @@ class JsonArray extends JsonValue with Iterable[JsonValue] with TWebServerRespon
     if(obj == null) false
     else if(this.getClass ne obj.getClass) false
     else this.values == obj.asInstanceOf[JsonArray].values
-
-  def getResponseData: String = this.toString()
-  def getMimeType = "application/json"
 }

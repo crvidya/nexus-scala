@@ -37,8 +37,7 @@ class WebSocketHandler extends SimpleChannelInboundHandler[WebSocketFrame] {
     case t: TextWebSocketFrame => //TODO: This is invalid data! Handle it!
     case f: CloseWebSocketFrame => {
       val handler = NetworkRegistry.getHandler(ctx)
-      if(handler.isEmpty) return
-      handler.get.closeConnection("Client requested disconnect")
+      if(handler.isDefined) handler.get.closeConnection("Client requested disconnect")
     }
     case f: PingWebSocketFrame => ctx.channel().write(new PongWebSocketFrame(f.content().retain()))
     case f => throw new UnsupportedOperationException("%s frame types not supported".format(msg.getClass.getName))
