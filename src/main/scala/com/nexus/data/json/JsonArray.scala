@@ -18,6 +18,7 @@ package com.nexus.data.json
 
 import java.io.Reader
 import scala.collection.mutable.ListBuffer
+import scala.collection.immutable
 
 object JsonArray {
   def readFrom(reader: Reader) = JsonValue.readFrom(reader).asArray
@@ -103,10 +104,9 @@ class JsonArray extends JsonValue with Iterable[JsonValue] {
 
   def iterator: Iterator[JsonValue] = {
     val iterator: Iterator[JsonValue] = this.values.iterator
-    new Iterator[JsonValue] {
+    new Iterator[JsonValue] {  //TODO: Deny all changing operations
       def hasNext: Boolean = iterator.hasNext
       def next(): JsonValue = iterator.next()
-      def remove() = throw new UnsupportedOperationException
     }
   }
   private [json] def write(writer: JsonWriter) = writer.writeArray(this)

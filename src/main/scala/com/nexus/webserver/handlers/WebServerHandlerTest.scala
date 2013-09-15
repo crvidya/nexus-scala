@@ -42,9 +42,11 @@ class WebServerHandlerTest extends TWebServerHandler {
     obj.add("list", list)
     obj.add("test", "abcd")
 
-    response.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"Nexus\"")
-    response.forceSendHeaders(HttpResponseStatus.UNAUTHORIZED)
-    //response.sendData(obj)
+    //response.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"Nexus\"")
+    //response.forceSendHeaders(HttpResponseStatus.UNAUTHORIZED)
+
+    response.sendHeaders(HttpResponseStatus.OK)
+    response.sendData(obj)
     response.close()
   }
 }
