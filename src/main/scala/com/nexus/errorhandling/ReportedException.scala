@@ -14,14 +14,15 @@
  * under the License
  */
 
-package com.nexus
+package com.nexus.errorhandling
 
-import com.nexus.concurrent.NexusUncaughtExceptionHandler
-
-object Start extends App {
-  Thread.setDefaultUncaughtExceptionHandler(NexusUncaughtExceptionHandler)
-  val thr = new Thread(new Runnable(){def run() = Nexus.start()})
-  thr.setUncaughtExceptionHandler(NexusUncaughtExceptionHandler)
-  thr.setName("Nexus Main Thread")
-  thr.start()
+/**
+ * No description given
+ *
+ * @author jk-5
+ */
+class ReportedException(private final val report: ErrorReport) extends RuntimeException {
+  def getReport = this.report
+  override def getCause = this.report.getCause
+  override def getMessage = this.report.getDescription
 }

@@ -20,6 +20,8 @@ import com.nexus.Nexus
 import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicInteger
 import com.nexus.traits.TLoader
+import java.lang.Thread.UncaughtExceptionHandler
+import com.nexus.errorhandling.{ReportedException, ErrorReport, ErrorHandler}
 
 /**
  * No description given
@@ -38,5 +40,19 @@ object WorkerPool extends TLoader {
 
 object WorkerThreadFactory extends ThreadFactory {
   private final val workerNumber = new AtomicInteger(1)
-  def newThread(r: Runnable): Thread = new Thread(r, "Nexus-Worker-" + workerNumber.getAndIncrement)
+  def newThread(r: Runnable): Thread = {
+    val thr = new Thread(r, "Nexus-Worker-" + workerNumber.getAndIncrement)
+    thr.setUncaughtExceptionHandler(NexusUncaughtExceptionHandler)
+    thr
+  }
+}
+
+object NexusUncaughtExceptionHandler extends UncaughtExceptionHandler {
+  def uncaughtException(thread: Thread, t: Throwable) = t match{
+    case report: ReportedException => ErrorHandler.unexpectedException(report)
+    case ex => {
+      val report = new ErrorReport("Uncaught exception in worker thread", t)
+      ErrorHandler.unexpectedException(new ReportedException(report))
+    }
+  }
 }

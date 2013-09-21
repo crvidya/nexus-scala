@@ -24,6 +24,7 @@ object NexusLog {
 	def log(level:Level, data:String) = NexusLogEngine.log(level, data)
 	def log(channel:String, level:Level, ex:Throwable, data:String) = NexusLogEngine.log(channel, level, ex, data)
 	def log(level:Level, ex:Throwable, data:String) = NexusLogEngine.log(level, ex, data)
+	def severe(data:String, t: Throwable) = NexusLogEngine.log(Level.SEVERE, t, data)
 	def severe(data:String) = NexusLogEngine.log(Level.SEVERE, data)
 	def warning(data:String) = NexusLogEngine.log(Level.WARNING, data)
 	def info(data:String) = NexusLogEngine.log(Level.INFO, data)

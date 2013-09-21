@@ -25,6 +25,7 @@ import com.nexus.data.config.ConfigFile
 import com.nexus.concurrent.WorkerPool
 import com.nexus.data.couchdb.CouchDB
 import com.nexus.time.synchronisation.TimeSynchronisationHandler
+import com.nexus.errorhandling.{ErrorReport, ReportedException, ErrorHandler}
 
 object Nexus {
 
@@ -54,7 +55,6 @@ object Nexus {
 object LoadClass {
   def apply(toload: Any): LoadClass = new LoadClass(toload)
 }
-
 class LoadClass(toLoad: Any) extends TLoader {
   def load() = toLoad.getClass
 }

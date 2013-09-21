@@ -29,7 +29,7 @@ import com.nexus.logging.NexusLog
  */
 object TimeSynchronisationHandler extends TLoader {
 
-  private var synchroniser: TimeSynchroniser = _
+  private var synchroniser: TimeSynchroniser = new TimeSynchroniserInternal
   private var failedAttempts = 0
 
   def synchronise(){
