@@ -16,9 +16,9 @@
 
 package com.nexus.authentication.tfa
 
-import java.lang.reflect.UndeclaredThrowableException
-import java.math.BigInteger
-import java.security.GeneralSecurityException
+import com.nexus.data.codec.Base32
+import java.util
+import java.util.Random
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -27,45 +27,82 @@ import javax.crypto.spec.SecretKeySpec
  *
  * @author jk-5
  */
-
 object TOTPHelper {
 
-  private final val DIGITS_POWER = Array[Int](1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000)
+  def generateSecretKey: String = {
+    val buffer: Array[Byte] = new Array[Byte](secretSize + numOfScratchCodes * scratchCodeSize)
+    new Random().nextBytes(buffer)
+    val secretKey: Array[Byte] = util.Arrays.copyOf(buffer, secretSize)
+    val encodedKey: String = Base32.encode(secretKey)
+    encodedKey
+  }
 
-  private def hmac_sha(crypto: String, keyBytes: Array[Byte], text: Array[Byte]): Array[Byte] = {
-    try {
-      val hmac = Mac.getInstance(crypto)
-      val macKey = new SecretKeySpec(keyBytes, "RAW")
-      hmac.init(macKey)
-      hmac.doFinal(text)
-    }catch{
-      case e: GeneralSecurityException => throw new UndeclaredThrowableException(e)
+  def getQRBarcodeURL(user: String, host: String, secret: String): String =
+    "https://www.google.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=otpauth://totp/%s@%s%%3Fsecret%%3D%s".format(user, host, secret)
+
+  private def verify_code(key: Array[Byte], t: Long): Int = {
+    val data: Array[Byte] = new Array[Byte](8)
+    var value: Long = t
+    var i: Int = 8
+    while ({i -= 1;i} > -1) {
+      data(i) = value.asInstanceOf[Byte]
+      value >>>= 8
     }
+    val signKey: SecretKeySpec = new SecretKeySpec(key, "HmacSHA1")
+    val mac: Mac = Mac.getInstance("HmacSHA1")
+    mac.init(signKey)
+    val hash: Array[Byte] = mac.doFinal(data)
+    val offset: Int = hash(20 - 1) & 0xF
+    var truncatedHash: Long = 0
+    i = 0
+    while (i < 4) {
+      truncatedHash <<= 8
+      truncatedHash |= (hash(offset + i) & 0xFF)
+      i += 1
+    }
+    truncatedHash &= 0x7FFFFFFF
+    truncatedHash %= 1000000
+    truncatedHash.asInstanceOf[Int]
   }
 
-  private def hexStr2Bytes(hex: String): Array[Byte] = {
-    val bArray = new BigInteger("10" + hex, 16).toByteArray
-    val ret = new Array[Byte](bArray.length - 1)
-    for(i <- 0 until ret.length) ret(1) = bArray(i+1)
-    ret
+  private[tfa] final val secretSize: Int = 10
+  private[tfa] final val numOfScratchCodes: Int = 5
+  private[tfa] final val scratchCodeSize: Int = 8
+}
+
+class TOTPHelper {
+  /**
+   * set the windows size. This is an integer value representing the number of 30 second windows we allow
+   * The bigger the window, the more tolerant of clock skew we are.
+   *
+   * @param s window size - must be >=1 and <=17.  Other values are ignored
+   */
+  def setWindowSize(s: Int) {
+    if (s >= 1 && s <= 17) window_size = s
   }
 
-  def generateTOTP(key: String, time: String, returnDigits: String): String = generateTOTP(key, time, returnDigits, "HmacSHA1")
-  def generateTOTP256(key: String, time: String, returnDigits: String): String = generateTOTP(key, time, returnDigits, "HmacSHA256")
-  def generateTOTP512(key: String, time: String, returnDigits: String): String = generateTOTP(key, time, returnDigits, "HmacSHA512")
-  def generateTOTP(key: String, t: String, returnDigits: String, crypto: String): String = {
-    var time = t
-    val codeDigits = Integer.decode(returnDigits).intValue()
-    var result: String = null
-    while(time.length < 16) time = "0" + time
-    val msg = this.hexStr2Bytes(time)
-    val k = this.hexStr2Bytes(key)
-    val hash = this.hmac_sha(crypto, k, msg)
-    val offset = hash(hash.length - 1) & 0xF
-    val binary = ((hash(offset) & 0x7F) << 24) | ((hash(offset + 1) & 0xFF) << 16) | ((hash(offset + 2) & 0xFF) << 8) | (hash(offset + 3) & 0xFF)
-    val otp = binary % DIGITS_POWER(codeDigits)
-    result = otp.toString
-    while(result.length < codeDigits) result = "0" + result
-    result
+  def check_code(secret: String, code: Long, timeMsec: Long): Boolean = {
+    val decodedKey: Array[Byte] = Base32.decode(secret)
+    val t: Long = (timeMsec / 1000L) / 30L
+    var i: Int = -window_size
+    while (i <= window_size) {
+      var hash: Long = 0L
+      try {
+        hash = TOTPHelper.verify_code(decodedKey, t + i)
+      }
+      catch {
+        case e: Exception => {
+          e.printStackTrace()
+          throw new RuntimeException(e.getMessage)
+        }
+      }
+      if (hash == code) {
+        return true
+      }
+      i += 1
+    }
+    false
   }
+
+  private[tfa] var window_size: Int = 3
 }
