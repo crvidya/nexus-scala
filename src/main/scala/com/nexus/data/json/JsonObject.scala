@@ -172,7 +172,7 @@ class JsonObject extends JsonValue with Iterable[JsonObject.Member]{
 
   override def size = names.size
   override def isEmpty = names.isEmpty
-  def getNames = this.names.toList
+  def getNames = this.names
 
   def iterator: Iterator[JsonObject.Member] = {
     val namesIterator = this.names.iterator

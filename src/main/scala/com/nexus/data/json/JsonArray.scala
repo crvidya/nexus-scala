@@ -100,7 +100,7 @@ class JsonArray extends JsonValue with Iterable[JsonValue] {
   override def isEmpty: Boolean = this.values.isEmpty
 
   def get(index: Int): JsonValue = this.values(index)
-  def getValues = this.values.toList
+  def getValues = this.values
 
   def iterator: Iterator[JsonValue] = {
     val iterator: Iterator[JsonValue] = this.values.iterator

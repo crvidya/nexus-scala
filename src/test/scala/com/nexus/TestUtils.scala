@@ -14,7 +14,7 @@
  * under the License
  */
 
-package com.nexus.tests
+package com.nexus
 
 import org.junit.Assert
 
@@ -35,7 +35,7 @@ object TestUtils {
 
   def assertException[T <: Exception](r: Runnable, typ: Class[T], msg: String): T = {
     val exception = this.assertException(r, typ)
-    Assert.assertEquals("Exception message should be equal", "message", exception.getMessage)
+    Assert.assertEquals("Exception message should be equal", msg, exception.getMessage)
     exception
   }
 

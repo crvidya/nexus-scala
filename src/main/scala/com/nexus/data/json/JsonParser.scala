@@ -16,7 +16,7 @@
 
 package com.nexus.data.json
 
-import java.io.Reader
+import java.io.{StringReader, Reader}
 
 object JsonParser {
   private def isWhiteSpace(ch: Int) = ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
@@ -25,6 +25,8 @@ object JsonParser {
 }
 
 class JsonParser(private final val reader: Reader) {
+
+  def this(json: String) = this(new StringReader(json))
 
   private final val recorder = new StringBuilder
   private var current: Int = 0

@@ -14,39 +14,19 @@
  * under the License
  */
 
+package com.nexus
 
+import org.junit.{Assert, Test}
+import com.nexus.Version
 
-apply plugin:'java'
-apply plugin:'scala'
-apply plugin:'idea'
-apply plugin:'eclipse'
+/**
+ * No description given
+ *
+ * @author jk-5
+ */
+class Version_Test {
 
-group = 'com.nexus'
-version = '1.0-SNAPSHOT'
-archivesBaseName = 'nexus'
-
-repositories{
-    mavenCentral()
+  @Test def buildIs0InSource(){
+    Assert.assertEquals(Version.build, 0)
+  }
 }
-
-jar{
-    manifest{
-        attributes 'Main-Class' : 'com.nexus.Start'
-    }
-}
-
-processResources{
-    eachFile{
-        expand 'version':project.version
-    }
-}
-
-dependencies{
-    compile 'org.scala-lang:scala-library:2.10.2'
-    compile 'io.netty:netty-all:4.0.7.Final'
-
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.mockito:mockito-all:1.9.5'
-}
-
-task wrapper(type: Wrapper) { gradleVersion = '1.7' }
