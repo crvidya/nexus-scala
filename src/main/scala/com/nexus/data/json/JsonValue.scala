@@ -23,6 +23,7 @@ import java.io.StringReader
 import java.io.StringWriter
 import java.io.Writer
 import com.nexus.webserver.TWebServerResponse
+import com.nexus.util.PrimitiveChecks
 
 object JsonValue {
   final val TRUE = new JsonLiteral("true")
@@ -38,8 +39,14 @@ object JsonValue {
     }
   def valueOf(value: Int) = new JsonNumber(value.toString)
   def valueOf(value: Long) = new JsonNumber(value.toString)
-  def valueOf(value: Float) = new JsonNumber(JsonValue.cutOffPointZero(value.toString))
-  def valueOf(value: Double) = new JsonNumber(JsonValue.cutOffPointZero(value.toString))
+  def valueOf(f: Float) = {
+    if(PrimitiveChecks.isInfinite(f) || PrimitiveChecks.isNaN(f)) throw new IllegalArgumentException("Infinite and NaN values not permitted in JSON")
+    new JsonNumber(JsonValue.cutOffPointZero(f.toString))
+  }
+  def valueOf(d: Double) = {
+    if(PrimitiveChecks.isInfinite(d) || PrimitiveChecks.isNaN(d)) throw new IllegalArgumentException("Infinite and NaN values not permitted in JSON")
+    new JsonNumber(JsonValue.cutOffPointZero(d.toString))
+  }
   def valueOf(string: String) = if (string == null) JsonValue.NULL else new JsonString(string)
   def valueOf(value: Boolean) = if (value) JsonValue.TRUE else JsonValue.FALSE
   private def cutOffPointZero(string: String): String =
