@@ -17,7 +17,6 @@
 package com.nexus
 
 import org.junit.{Assert, Test}
-import com.nexus.Version
 
 /**
  * No description given

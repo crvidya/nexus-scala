@@ -83,13 +83,13 @@ class JsonWriter(private final val writer: Writer) {
     writeEndObject()
   }
 
-  protected def writeBeginObject() = writer.write('{')
-  protected def writeEndObject() = writer.write('}')
-  protected def writeNameValueSeparator() = writer.write(':')
-  protected def writeObjectValueSeparator() = writer.write(',')
-  protected def writeBeginArray() = writer.write('[')
-  protected def writeEndArray() = writer.write(']')
-  protected def writeArrayValueSeparator() = writer.write(',')
+  def writeBeginObject() = writer.write('{')
+  def writeEndObject() = writer.write('}')
+  def writeNameValueSeparator() = writer.write(':')
+  def writeObjectValueSeparator() = writer.write(',')
+  def writeBeginArray() = writer.write('[')
+  def writeEndArray() = writer.write(']')
+  def writeArrayValueSeparator() = writer.write(',')
 
   private [json] def writeArray(array: JsonArray) {
     writeBeginArray()

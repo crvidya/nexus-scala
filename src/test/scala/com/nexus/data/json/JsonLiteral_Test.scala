@@ -18,7 +18,6 @@ package com.nexus.data.json
 
 import org.junit.{Assert, Test, Before}
 import java.io.StringWriter
-import com.nexus.data.json.{JsonLiteral, JsonValue, JsonWriter}
 
 /**
  * No description given

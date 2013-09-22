@@ -17,7 +17,6 @@
 package com.nexus.data.json
 
 import java.io.StringWriter
-import com.nexus.data.json.{JsonNumber, JsonWriter}
 import org.junit.{Assert, Test, Before}
 
 /**
