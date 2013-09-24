@@ -16,7 +16,11 @@
 
 package com.nexus.webserver.handlers
 
-import com.nexus.webserver.TWebServerHandler
+import com.nexus.webserver.{WebServerResponse, WebServerRequest, TWebServerHandler}
+import com.nexus.webapi.{TWebApiHandler, WebApiHandlerFactory}
+import com.nexus.data.json.JsonObject
+import io.netty.handler.codec.http.HttpResponseStatus
+import com.nexus.errorhandling.{ReportedException, ErrorHandler, ErrorReportCategory, ErrorReport}
 
 /**
  * No description given
@@ -25,4 +29,28 @@ import com.nexus.webserver.TWebServerHandler
  */
 class WebServerHandlerAPI extends TWebServerHandler {
 
+  override def handle(request: WebServerRequest, response: WebServerResponse){
+    var handler: TWebApiHandler = null
+    try{
+      handler = WebApiHandlerFactory.handleRequest(request, response)
+      val data = handler.handle(request)
+      val ret = new JsonObject().addError("none").add("data", data)
+      response.sendHeaders(HttpResponseStatus.OK)
+      response.sendData(ret)
+      response.close()
+    }catch{
+      case e: Exception => {
+        response.sendHeaders(HttpResponseStatus.INTERNAL_SERVER_ERROR)
+        response.sendError("Error while processing request")
+        response.close()
+        val report = new ErrorReport("Error while processing WebApi request", e)
+        val category = new ErrorReportCategory(report, "Client being processed")
+        report.addCategory(category)
+        category.addSection("WebApi function", handler)
+        category.addSection("Hostname", request.getAddress.getHostName)
+        category.addSection("Address", request.getAddress.getHostAddress)
+        ErrorHandler.unexpectedException(new ReportedException(report))
+      }
+    }
+  }
 }

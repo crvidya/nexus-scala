@@ -124,4 +124,6 @@ class ErrorReport(private final val description: String, private final val cause
       }
     }
   }
+
+  def addCategory(c: ErrorReportCategory) = this.categories += c
 }

@@ -28,7 +28,9 @@ import com.nexus.time.NexusTime
  */
 object ErrorHandler {
 
-  def unexpectedException(throwable: Throwable){
+  private final val output = sys.props.get("nexus.errorHandler.outputErrors").getOrElse("false").equalsIgnoreCase("true")
+
+  def unexpectedException(throwable: Throwable) = if(this.output) throwable.printStackTrace() else {
     val report = throwable match {
       case rep: ReportedException => rep.getReport
       case t => new ErrorReport("Unknown error cause", t)

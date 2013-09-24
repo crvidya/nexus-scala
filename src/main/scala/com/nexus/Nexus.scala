@@ -26,6 +26,7 @@ import com.nexus.concurrent.WorkerPool
 import com.nexus.data.couchdb.CouchDB
 import com.nexus.time.synchronisation.TimeSynchronisationHandler
 import com.nexus.errorhandling.{ErrorReport, ReportedException, ErrorHandler}
+import com.nexus.webapi.WebApiHandlerRegistry
 
 object Nexus {
 
@@ -36,6 +37,7 @@ object Nexus {
     CouchDB,
     TimeSynchronisationHandler,
     LoadClass(WebServerHandlerRegistry),
+    LoadClass(WebApiHandlerRegistry),
     SslContextProvider,
     WebServer
   )

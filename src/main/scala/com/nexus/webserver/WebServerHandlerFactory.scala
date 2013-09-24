@@ -36,7 +36,7 @@ object WebServerHandlerFactory {
       val args = ListBuffer[String]()
       var breakIterator = false
       for(e: util.Map.Entry[String, TWebServerHandler] <- WebServerHandlerRegistry.getHandlers.entrySet() if !breakIterator){
-        var path = Utils.sanitizeURI(req.getUri)
+        var path = Utils.sanitizeURI(req.getUri.split("\\?",2)(0))
         val regex = Pattern.compile(e.getKey)
         val matcher = regex.matcher(path)
         if(matcher.find()){

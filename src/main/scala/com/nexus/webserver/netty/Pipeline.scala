@@ -31,6 +31,7 @@ import io.netty.handler.stream.ChunkedWriteHandler
  * @author jk-5
  */
 object Pipeline extends ChannelInitializer[SocketChannel] {
+
   override def initChannel(channel: SocketChannel){
     val pipe = channel.pipeline()
 

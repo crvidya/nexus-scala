@@ -39,11 +39,11 @@ class WebServerRequest(private final val ctx: ChannelHandlerContext, private fin
   def isHeaderPresent(key:String) = this.request.headers().contains(key)
   def isParameterPresent(key:String) = this.params.containsKey(key)
 
-  def getHeader(key:String) = this.request.headers().get(key)
-  def getParameter(key:String) = this.params.get(key).get(0)
-
-  def getHeaderOrEmptyString(key:String) = if(this.isParameterPresent(key)) this.getParameter(key) else ""
-  def getParameterOrEmptyString(key:String) = if(this.isHeaderPresent(key)) this.getHeader(key) else ""
+  def getHeader(key:String): Option[String] = this.request.headers().get(key) match{
+    case s: String => Some(s)
+    case _ => None
+  }
+  def getParameter(key:String): Option[String] = if(this.params.get(key) == null || this.params.get(key).size() == 0) None else Some(this.params.get(key).get(0))
 
   def getContext = this.ctx
   def getHttpRequest = this.request

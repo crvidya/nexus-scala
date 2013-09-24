@@ -40,20 +40,25 @@ class WebServerHandlerHtml extends TWebServerHandler {
       this.sendError(ctx, HttpResponseStatus.BAD_REQUEST)
       return
     }
-    val uri = req.getUri
+    val uri = req.getUri.split("\\?", 2)(0)
     val path = htdocsLocation + Utils.sanitizeURI(uri)
     if(path == null){
       this.sendError(ctx, HttpResponseStatus.FORBIDDEN)
       return
     }
-    val file = new File(path)
+    var file = new File(path)
+    if(file.isDirectory){
+      val index = new File(file, "index.html")
+      if(index.exists() && index.isFile) file = index
+    }
     if(file.isHidden || !file.exists){
       this.sendError(ctx, HttpResponseStatus.NOT_FOUND)
       return
     }
     if(file.isDirectory){
-      if(uri.endsWith("/")) {}//this.sendFileList(ctx, file) //TODO: file list?
-      else this.sendRedirect(ctx, uri + "/")
+      if(uri.endsWith("/")) {
+        //this.sendFileList(ctx, file) //TODO: file list?
+      }else this.sendRedirect(ctx, uri + "/")
       return
     }
     if(!file.isFile){
@@ -82,14 +87,18 @@ class WebServerHandlerHtml extends TWebServerHandler {
     }
     val fileLength = raf.length()
     val response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK)
+
     this.setContentLength(response, fileLength)
     this.setContentType(response, file)
     this.setDateAndCacheHeaders(response, file)
+    this.setDefaultHeaders(response)
     if(HttpHeaders.isKeepAlive(req)) response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE)
     ctx.write(response)
+
     var sendFileFuture: ChannelFuture = null
     if(this.useSendFile) sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel, 0, fileLength), ctx.newProgressivePromise())
     else sendFileFuture = ctx.write(new ChunkedFile(raf, 0, fileLength, 8192), ctx.newProgressivePromise())
+
     val lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT)
     if(!HttpHeaders.isKeepAlive(req)) lastContentFuture.addListener(ChannelFutureListener.CLOSE)
   }

@@ -28,7 +28,7 @@ object WebServerHandlerRegistry {
 
   private final val handlers = mutable.LinkedHashMap[String, TWebServerHandler](
     "/websocket/" -> new WebServerHandlerWebsocket("/websocket"),
-    "/test/(.*)" -> new WebServerHandlerTest,
+    "/api/" -> new WebServerHandlerAPI,
     "/(.*)" -> new WebServerHandlerHtml
   )
   def getHandlers = this.handlers
