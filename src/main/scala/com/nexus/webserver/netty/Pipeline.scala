@@ -23,6 +23,7 @@ import io.netty.handler.codec.http._
 import com.nexus.webserver.SslContextProvider
 import com.nexus.network.codec.{PacketJsonDecoder, JsonObjectDecoder, JsonObjectEncoder, PacketJsonEncoder}
 import com.nexus.network.PacketHandler
+import io.netty.handler.stream.ChunkedWriteHandler
 
 /**
  * TODO: Enter description
@@ -51,6 +52,7 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
     pipe.addLast("jsonEncoder", new JsonObjectEncoder)
     pipe.addLast("packetJsonDecoder", new PacketJsonDecoder())
     pipe.addLast("packetJsonEncoder", new PacketJsonEncoder())
+    pipe.addLast("chunkedWriter", new ChunkedWriteHandler())
     pipe.addLast("webserverHandler", webserverHandler)
     pipe.addLast("readTimeoutHandler", readTimeoutHandler)
     pipe.addLast("websocketHandler", websocketHandler)

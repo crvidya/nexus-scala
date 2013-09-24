@@ -46,7 +46,6 @@ class WebServerHandlerHtml extends TWebServerHandler {
       this.sendError(ctx, HttpResponseStatus.FORBIDDEN)
       return
     }
-    println(uri + "     " + path)
     val file = new File(path)
     if(file.isHidden || !file.exists){
       this.sendError(ctx, HttpResponseStatus.NOT_FOUND)
@@ -91,13 +90,6 @@ class WebServerHandlerHtml extends TWebServerHandler {
     var sendFileFuture: ChannelFuture = null
     if(this.useSendFile) sendFileFuture = ctx.write(new DefaultFileRegion(raf.getChannel, 0, fileLength), ctx.newProgressivePromise())
     else sendFileFuture = ctx.write(new ChunkedFile(raf, 0, fileLength, 8192), ctx.newProgressivePromise())
-
-    sendFileFuture.addListener(new ChannelProgressiveFutureListener {
-      override def operationProgressed(future: ChannelProgressiveFuture, progress: Long, total: Long) =
-        if(total < 0) println("Transfer progress: " + progress)
-        else println("Transfer progress: " + progress + " / " + total)
-      def operationComplete(future: ChannelProgressiveFuture) = println("Transfer complete!")
-    })
     val lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT)
     if(!HttpHeaders.isKeepAlive(req)) lastContentFuture.addListener(ChannelFutureListener.CLOSE)
   }

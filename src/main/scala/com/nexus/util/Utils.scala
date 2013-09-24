@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.io.File
 import javax.activation.MimetypesFileTypeMap
+import javax.swing.JFileChooser
 
 object Utils {
 
@@ -43,7 +44,23 @@ object Utils {
     uri
 	}
 
-  def getMimeType(f:File):String = new MimetypesFileTypeMap().getContentType(f)
+  def getExtension(f: File): String = {
+    val i = f.getName.lastIndexOf('.')
+    val p = Math.max(f.getName.lastIndexOf('/'), f.getName.lastIndexOf('\\'))
+
+    if (i > p) return f.getName.substring(i+1)
+    ""
+  }
+
+  def getMimeType(f:File):String = getExtension(f) match{
+    case "js" => "text/javascript"
+    case "css" => "text/css"
+    case "html" => "text/html"
+    case "htm" => "text/html"
+    case "woff" => "font/woff"
+    case "png" => "image/png"
+    case _ => new MimetypesFileTypeMap().getContentType(f.getPath)
+  }
   def escape(in: String): String = {
     val sb = new StringBuilder
     val len = in.length()
