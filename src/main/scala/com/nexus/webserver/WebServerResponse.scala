@@ -85,11 +85,6 @@ class WebServerResponse(private final val request: WebServerRequest) {
     p.addError(s)
     this.sendData(p)
   }
-  /*def SendEventResult(e:Event){
-    val p = new JSONPacket()
-    p.addEventResult(e)
-    this.sendData(p)
-  }*/
   def close(): ChannelFuture = {
     this.ctx.flush().close().addListener(new ChannelFutureListener {
       def operationComplete(future: ChannelFuture) {
