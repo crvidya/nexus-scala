@@ -18,7 +18,7 @@ package com.nexus.network
 
 import scala.collection.mutable
 import io.netty.channel.ChannelHandlerContext
-import com.nexus.network.handlers.{NetworkHandlerWebsocket, NetworkHandler}
+import com.nexus.network.handlers.{DummyNetworkHandler, NetworkHandlerWebsocket, NetworkHandler}
 
 /**
  * No description given
@@ -32,7 +32,12 @@ object NetworkRegistry {
   )
   private final val ctxToHandlerMap = mutable.HashMap[ChannelHandlerContext, NetworkHandler]()
 
-  def getHandlerClass(decoder: String) = this.decoderToHandlerClass.get(decoder)
-  def addHandler(handler: NetworkHandler) = this.ctxToHandlerMap.put(handler.getChannelContext, handler)
-  def getHandler(ctx: ChannelHandlerContext): Option[NetworkHandler] = this.ctxToHandlerMap.get(ctx)
+  @inline def getHandlerClass(decoder: String) = this.decoderToHandlerClass.get(decoder)
+  @inline def addHandler(handler: NetworkHandler) = this.ctxToHandlerMap.put(handler.getChannelContext, handler)
+  @inline def getHandler(ctx: ChannelHandlerContext): Option[NetworkHandler] = this.ctxToHandlerMap.get(ctx)
+  @inline def getOrCreateHandler(ctx: ChannelHandlerContext): NetworkHandler = this.ctxToHandlerMap.get(ctx).getOrElse(new DummyNetworkHandler(ctx))
+  def upgradeHandler(handler: NetworkHandler, newHandler: NetworkHandler){
+    this.ctxToHandlerMap.remove(this.ctxToHandlerMap.find(_._2 == handler).get._1)
+    this.addHandler(newHandler)
+  }
 }

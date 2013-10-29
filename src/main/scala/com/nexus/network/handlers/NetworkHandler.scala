@@ -18,7 +18,7 @@ package com.nexus.network.handlers
 
 import com.nexus.network.packet.{PacketCloseConnection, PacketAuthenticationSuccess, Packet}
 import io.netty.channel.{ChannelFuture, ChannelHandlerContext}
-import com.nexus.webserver.netty.CancelableReadTimeoutHandler
+import io.netty.handler.timeout.{IdleStateEvent, IdleState}
 
 /**
  * No description given
@@ -35,10 +35,24 @@ abstract class NetworkHandler(private final val ctx: ChannelHandlerContext) {
   def closeConnection(): ChannelFuture = this.closeConnection("No reason given")
   private def onHandlerRegistered() = {}
 
+  final def needsAuthentication = this.isInstanceOf[DummyNetworkHandler]
+
   final def handlerRegistered(){
     this.onHandlerRegistered()
     this.sendPacket(new PacketAuthenticationSuccess)
-    ctx.channel().pipeline().get(classOf[CancelableReadTimeoutHandler]).disable()
+  }
+
+  def onPipelineEvent(event: AnyRef){
+    event match {
+      case e: IdleStateEvent => e.state() match {
+        case IdleState.READER_IDLE => if(this.needsAuthentication){
+          ctx.writeAndFlush(new PacketCloseConnection("Not logged in for 10 seconds"))
+          ctx.close()
+        }
+        case IdleState.WRITER_IDLE => //TODO: Try ping
+        case IdleState.ALL_IDLE => //TODO: Not sure what to do here? Just close it?
+      }
+    }
   }
 
   final def getChannelContext = this.ctx

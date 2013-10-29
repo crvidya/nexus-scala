@@ -18,25 +18,12 @@ package com.nexus.webserver.netty
 
 import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext, SimpleChannelInboundHandler}
 import io.netty.handler.codec.http._
-import io.netty.handler.codec.http.websocketx.WebSocketFrame
 import io.netty.buffer.Unpooled
 import io.netty.util.CharsetUtil
 import com.nexus.webserver.annotation.Authenticated
-import com.nexus.webserver.handlers.WebServerHandlerWebsocket
 import io.netty.handler.ssl.NotSslRecordException
 import com.nexus.webserver.{WebServerHandlerFactory, TWebServerHandler}
 import io.netty.handler.codec.base64.Base64
-import io.netty.handler.timeout.ReadTimeoutHandler
-
-/*
-TODO: REMOVE ME!
-17:15
-
-Aardappelen 9 -> 5
-Ju 4
-Boontjes laten
- */
-
 
 /**
  * No description given

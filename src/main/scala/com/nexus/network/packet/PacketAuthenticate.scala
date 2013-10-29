@@ -38,11 +38,11 @@ class PacketAuthenticate extends Packet {
   }
   def processPacket(handler: NetworkHandler){
     //TODO: Authenticate it!
-    if(handler.isInstanceOf[DummyNetworkHandler]){
+    if(handler.needsAuthentication){
       val handlerClass = NetworkRegistry.getHandlerClass(this.getDecoder)
       if(handlerClass.isEmpty) return //TODO: Handle this!
       val newHandler = handlerClass.get.getConstructor(classOf[ChannelHandlerContext]).newInstance(handler.getChannelContext)
-      NetworkRegistry.addHandler(newHandler)
+      NetworkRegistry.upgradeHandler(handler, newHandler)
       newHandler.handlerRegistered()
     }
   }

@@ -19,19 +19,25 @@ package com.nexus.network
 import com.nexus.network.packet.Packet
 import io.netty.channel.{ChannelHandlerContext, SimpleChannelInboundHandler}
 import com.nexus.concurrent.WorkerPool
-import com.nexus.network.handlers.{NetworkHandler, DummyNetworkHandler}
+import com.nexus.network.handlers.NetworkHandler
+import io.netty.channel.ChannelHandler.Sharable
 
 /**
  * No description given
  *
  * @author jk-5
  */
-class PacketHandler extends SimpleChannelInboundHandler[Packet] {
+@Sharable
+object PacketHandler extends SimpleChannelInboundHandler[Packet] {
 
   def channelRead0(ctx: ChannelHandlerContext, packet: Packet){
-    var handler = NetworkRegistry.getHandler(ctx)
-    if(!handler.isDefined) handler = Some(new DummyNetworkHandler(ctx))
-    WorkerPool.execute(new ProcessPacketTask(packet, handler.get))
+    val handler = NetworkRegistry.getOrCreateHandler(ctx)
+    WorkerPool.execute(new ProcessPacketTask(packet, handler))
+  }
+
+  override def userEventTriggered(ctx: ChannelHandlerContext, event: AnyRef){
+    ctx.fireUserEventTriggered(event)
+    NetworkRegistry.getOrCreateHandler(ctx).onPipelineEvent(event)
   }
 
   class ProcessPacketTask(packet: Packet, handler: NetworkHandler) extends Runnable{

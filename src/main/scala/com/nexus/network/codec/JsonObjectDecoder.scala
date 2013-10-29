@@ -21,13 +21,15 @@ import io.netty.handler.codec.MessageToMessageDecoder
 import io.netty.channel.ChannelHandlerContext
 import java.util
 import com.nexus.data.json.JsonObject
+import io.netty.channel.ChannelHandler.Sharable
 
 /**
  * Tries to decode TextWebSocketFrames into JsonObjects. Returns the TextWebSocketFrame if no valid json was found
  *
  * @author jk-5
  */
-class JsonObjectDecoder extends MessageToMessageDecoder[TextWebSocketFrame] {
+@Sharable
+object JsonObjectDecoder extends MessageToMessageDecoder[TextWebSocketFrame] {
 
   override def decode(ctx: ChannelHandlerContext, msg: TextWebSocketFrame, out: util.List[AnyRef]){
     try{

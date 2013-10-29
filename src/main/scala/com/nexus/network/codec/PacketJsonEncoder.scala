@@ -14,7 +14,7 @@ import com.nexus.data.json.JsonObject
  * @author jk-5
  */
 @Sharable
-class PacketJsonEncoder extends MessageToMessageEncoder[Packet] {
+object PacketJsonEncoder extends MessageToMessageEncoder[Packet] {
 
   override def encode(ctx: ChannelHandlerContext, packet: Packet, out: util.List[AnyRef]){
     val data = new JsonObject

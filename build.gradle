@@ -44,6 +44,7 @@ processResources{
 dependencies{
     compile 'org.scala-lang:scala-library:2.10.2'
     compile 'io.netty:netty-all:4.0.7.Final'
+    compile 'com.ning:async-http-client:1.7.19'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.9.5'

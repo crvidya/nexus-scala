@@ -30,7 +30,6 @@ import com.nexus.network.NetworkRegistry
  */
 class WebSocketHandler extends SimpleChannelInboundHandler[WebSocketFrame] {
 
-  private var readTimeoutHandler: CancelableReadTimeoutHandler = _
   private var handshaker: WebSocketServerHandshaker = _
 
   override def channelRead0(ctx: ChannelHandlerContext, msg: WebSocketFrame) = msg match {
@@ -45,10 +44,8 @@ class WebSocketHandler extends SimpleChannelInboundHandler[WebSocketFrame] {
 
   override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) = cause match{
     case e: NotSslRecordException => //TODO: Redirect to SSL
-    case e: ReadTimeoutException => ctx.writeAndFlush(new PacketCloseConnection("Not logged in for 10 seconds"))
   }
 
-  def setReadTimeoutHandler(handler: CancelableReadTimeoutHandler) = this.readTimeoutHandler = handler
   def setHandshaker(h: WebSocketServerHandshaker) = this.handshaker = h
   def getHandshaker = this.handshaker
 }

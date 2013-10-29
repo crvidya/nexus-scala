@@ -23,10 +23,11 @@ import com.nexus.webserver.netty.WebServer
 import java.io.File
 import com.nexus.data.config.ConfigFile
 import com.nexus.concurrent.WorkerPool
-import com.nexus.data.couchdb.CouchDB
+import com.nexus.data.couchdb.{UID, CouchDB}
 import com.nexus.time.synchronisation.TimeSynchronisationHandler
 import com.nexus.errorhandling.{ErrorReport, ReportedException, ErrorHandler}
 import com.nexus.webapi.WebApiHandlerRegistry
+import com.nexus.authentication.User
 
 object Nexus {
 
@@ -49,6 +50,9 @@ object Nexus {
     this.config = new ConfigFile(new File(this.CONFIG_DIR, "Nexus.cfg")).setComment("Nexus main configuration file")
 
 		this.loaders.foreach(l=>l.load())
+
+    val user = CouchDB.getObjectFromID(new UID("7b861f20e7ec41368a4042bbc18a4598"), new User(""))
+    println(user.getUsername)
 	}
 
   def getConfig = this.config

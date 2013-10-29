@@ -21,13 +21,15 @@ import io.netty.channel.ChannelHandlerContext
 import java.util
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import com.nexus.data.json.JsonObject
+import io.netty.channel.ChannelHandler.Sharable
 
 /**
  * Encodes an JsonObject into an TextWebSocketFrame
  *
  * @author jk-5
  */
-class JsonObjectEncoder extends MessageToMessageEncoder[JsonObject] {
+@Sharable
+object JsonObjectEncoder extends MessageToMessageEncoder[JsonObject] {
 
   override def encode(ctx: ChannelHandlerContext, data: JsonObject, out: util.List[AnyRef]){
     out.add(new TextWebSocketFrame(data.stringify))

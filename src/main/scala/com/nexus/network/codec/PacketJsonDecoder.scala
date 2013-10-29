@@ -22,13 +22,15 @@ import io.netty.channel.ChannelHandlerContext
 import java.util
 import com.nexus.data.json.JsonObject
 import com.nexus.network.PacketManager
+import io.netty.channel.ChannelHandler.Sharable
 
 /**
  * Decodes an JsonObject into an Packet
  *
  * @author jk-5
  */
-class PacketJsonDecoder extends MessageToMessageDecoder[JsonObject] {
+@Sharable
+object PacketJsonDecoder extends MessageToMessageDecoder[JsonObject] {
 
   override def decode(ctx: ChannelHandlerContext, data: JsonObject, out: util.List[AnyRef]){
     if(data == null || data.get("id") == null){

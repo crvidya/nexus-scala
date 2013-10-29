@@ -24,6 +24,7 @@ import com.nexus.webserver.SslContextProvider
 import com.nexus.network.codec.{PacketJsonDecoder, JsonObjectDecoder, JsonObjectEncoder, PacketJsonEncoder}
 import com.nexus.network.PacketHandler
 import io.netty.handler.stream.ChunkedWriteHandler
+import io.netty.handler.timeout.IdleStateHandler
 
 /**
  * TODO: Enter description
@@ -38,25 +39,24 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
     if(SslContextProvider.isValid){
       val engine = SslContextProvider.getContext.createSSLEngine()
       engine.setUseClientMode(false)
-      pipe.addLast("ssl", new SslHandler(engine))
+      pipe.addLast("ssl", new SslHandler(engine))                       //Upstream & Downstream
     }
-    val readTimeoutHandler = new CancelableReadTimeoutHandler(10)
 
     val websocketHandler = new WebSocketHandler
     val webserverHandler = new WebServerHandler
     webserverHandler.setWebSocketHandler(websocketHandler)
-    websocketHandler.setReadTimeoutHandler(readTimeoutHandler)
 
-    pipe.addLast("http-codec", new HttpServerCodec)
-    pipe.addLast("aggregator", new HttpObjectAggregator(1048576))
-    pipe.addLast("jsonDecoder", new JsonObjectDecoder)
-    pipe.addLast("jsonEncoder", new JsonObjectEncoder)
-    pipe.addLast("packetJsonDecoder", new PacketJsonDecoder())
-    pipe.addLast("packetJsonEncoder", new PacketJsonEncoder())
-    pipe.addLast("chunkedWriter", new ChunkedWriteHandler())
-    pipe.addLast("webserverHandler", webserverHandler)
-    pipe.addLast("readTimeoutHandler", readTimeoutHandler)
-    pipe.addLast("websocketHandler", websocketHandler)
-    pipe.addLast("packetHandler", new PacketHandler)
+    pipe.addLast("httpDecoder", new HttpRequestDecoder)                 //Downstream
+    pipe.addLast("httpEncoder", new HttpResponseEncoder)                //Upstream
+    pipe.addLast("aggregator", new HttpObjectAggregator(1048576))       //Downstream
+    pipe.addLast("jsonDecoder", JsonObjectDecoder)                      //Downstream
+    pipe.addLast("jsonEncoder", JsonObjectEncoder)                      //Upstream
+    pipe.addLast("packetJsonDecoder", PacketJsonDecoder)                //Downstream
+    pipe.addLast("packetJsonEncoder", PacketJsonEncoder)                //Upstream
+    pipe.addLast("chunkedWriter", new ChunkedWriteHandler())            //Upstream
+    pipe.addLast("webserverHandler", webserverHandler)                  //Downstream
+    pipe.addLast("idleStateHandler", new IdleStateHandler(10, 30, 60))  //Upstream & Downstream
+    pipe.addLast("websocketHandler", websocketHandler)                  //Downstream
+    pipe.addLast("packetHandler", PacketHandler)                        //Downstream
   }
 }
