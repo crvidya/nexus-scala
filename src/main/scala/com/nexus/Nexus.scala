@@ -25,7 +25,6 @@ import com.nexus.data.config.ConfigFile
 import com.nexus.concurrent.WorkerPool
 import com.nexus.data.couchdb.{UID, CouchDB}
 import com.nexus.time.synchronisation.TimeSynchronisationHandler
-import com.nexus.errorhandling.{ErrorReport, ReportedException, ErrorHandler}
 import com.nexus.webapi.WebApiHandlerRegistry
 import com.nexus.authentication.User
 
@@ -44,7 +43,7 @@ object Nexus {
   )
 
 	def start(){
-		NexusLog.info("Starting nexus-scala, version %s (build %d)".format(Version.version, Version.build))
+		NexusLog.info("Starting nexus-scala, version %s (build %d)", Version.version, Version.build)
 
     if(!this.CONFIG_DIR.exists()) this.CONFIG_DIR.mkdirs()
     this.config = new ConfigFile(new File(this.CONFIG_DIR, "Nexus.cfg")).setComment("Nexus main configuration file")

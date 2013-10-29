@@ -14,16 +14,13 @@
  * under the License
  */
 
-package com.nexus.event
+package com.nexus.event;
 
 /**
  * No description given
  *
  * @author jk-5
  */
-trait IEventListener {
-  def invoke(event: Event)
-}
-trait IGeneratedEventListener extends IEventListener {
-  def getTarget: Any
+public enum EventResult {
+    DENY, DEFAULT, ALLOW
 }

@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin:'java'
 apply plugin:'scala'
 apply plugin:'idea'
@@ -45,6 +47,9 @@ dependencies{
     compile 'org.scala-lang:scala-library:2.10.2'
     compile 'io.netty:netty-all:4.0.7.Final'
     compile 'com.ning:async-http-client:1.7.19'
+    compile 'org.ow2.asm:asm:5.0_BETA'
+    compile 'com.google.code.findbugs:jsr305:2.0.2' //Needed for guava
+    compile 'com.google.guava:guava:15.0'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.9.5'
