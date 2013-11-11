@@ -30,10 +30,12 @@ import com.nexus.Nexus
  * @author jk-5
  */
 object WebServer extends TLoader {
-	override def load = new WebServer(Nexus.getConfig.getTag("webserver").getTag("port").setComment("Port to host webserver on").getIntValue(9001)).start()
+	override def load() = new WebServer(Nexus.getConfig.getTag("webserver").getTag("port").setComment("Port to host webserver on").getIntValue(9001)).start()
 }
 
 class WebServer(private final val port: Int) extends Thread {
+  this.setName("Nexus WebServer main thread")
+
 	override def run() {
 		val boss = new NioEventLoopGroup
 		val worker = new NioEventLoopGroup

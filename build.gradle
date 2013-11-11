@@ -16,8 +16,6 @@
 
 
 
-
-
 apply plugin:'java'
 apply plugin:'scala'
 apply plugin:'idea'
@@ -45,9 +43,10 @@ processResources{
 
 dependencies{
     compile 'org.scala-lang:scala-library:2.10.2'
-    compile 'io.netty:netty-all:4.0.7.Final'
-    compile 'com.ning:async-http-client:1.7.19'
+    compile 'io.netty:netty-all:4.0.12.Final'
+    compile 'com.ning:async-http-client:1.7.20'
     compile 'org.ow2.asm:asm:5.0_BETA'
+    compile 'org.slf4j:slf4j-nop:1.7.5' //Because async-http-client ships the slf4j api that throws stupid warnings
     compile 'com.google.code.findbugs:jsr305:2.0.2' //Needed for guava
     compile 'com.google.guava:guava:15.0'
 

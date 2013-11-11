@@ -24,7 +24,7 @@ import java.lang.annotation.Annotation
  * @author jk-5
  */
 object Event {
-  private val listeners = new ListenerList
+  private final val listeners = new ListenerList
 }
 class Event {
   private var result = EventResult.DEFAULT
@@ -45,7 +45,7 @@ class Event {
 
   @inline def isCancelable = this.eventCancelable
   @inline def isCanceled = this.eventCanceled
-  @inline def getListenerList:ListenerList = Event.listeners
+  @inline def getListenerList = Event.listeners
   @inline def hasResult = this.eventHasResult
   @inline def getResult = this.result
 

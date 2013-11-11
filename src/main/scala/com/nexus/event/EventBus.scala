@@ -57,7 +57,7 @@ class EventBus {
               if(!classOf[Event].isAssignableFrom(eventType)){
                 throw new IllegalArgumentException("Method " + method + " has @EventHandler annotation, but provides an argument that is not an Event (" + eventType + ")")
               }
-              register(eventType, target, method)
+              register(eventType.asInstanceOf[Class[_ <: Event]], target, method)
               registered = true
             }
           }catch{
@@ -68,11 +68,32 @@ class EventBus {
     }
   }
 
-  private def register(eventType: Class[_], target: Any, method: Method){
+  private def register(eventType: Class[_ <: Event], target: Any, method: Method){
     if(Modifier.isAbstract(eventType.getModifiers)){
       NexusLog.warning("Tried to register an event listener for an abstract event!")
       NexusLog.warning("This is bad! The event listener will not be registered.")
       NexusLog.warning("Remove the abstract modifier from the event %s to fix this", eventType.getName)
+      return
     }
+    try{
+      val ctr = eventType.getConstructor()
+      ctr.setAccessible(true)
+      val event = ctr.newInstance()
+      val listener = new ASMEventHandler(target, method)
+      event.getListenerList.register(this.busID, listener.getPriority, listener)
+      var others = this.listeners.get(target)
+      if(others == null){
+        others = ArrayBuffer[IEventListener]()
+        this.listeners.put(target, others)
+      }
+      others.add(listener)
+    }
+  }
+
+  @inline def unregister(obj: Any) = this.listeners.remove(obj).foreach(l => ListenerList.unregiterAll(this.busID, l))
+
+  def post(event: Event): Boolean = {
+    event.getListenerList.getListeners(this.busID).foreach(_.invoke(event))
+    event.isCancelable && event.isCanceled
   }
 }
