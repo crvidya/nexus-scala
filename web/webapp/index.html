@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright 2013 TeamNexus
+  ~
+  ~ TeamNexus Licenses this file to you under the MIT License (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at:
+  ~
+  ~    http://opensource.org/licenses/mit-license.php
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations
+  ~ under the License
+  -->
+
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>Nexus</title>
+
+    <script>
+        /*
+         *  AngularJS v1.0.0rc1
+         *  (c) 2010-2012 AngularJS http://angularjs.org
+         *  License: MIT
+         */
+        'use strict';(function(i){function d(c,a,e){return c[a]||(c[a]=e())}return d(d(i,"angular",Object),"module",function(){var c={};return function(a,e,f){e&&c.hasOwnProperty(a)&&(c[a]=null);return d(c,a,function(){function b(a,b,d){return function(){c[d||"push"]([a,b,arguments]);return g}}if(!e)throw Error("No module: "+a);var c=[],d=[],h=b("$injector","invoke"),g={_invokeQueue:c,_runBlocks:d,requires:e,name:a,provider:b("$provide","provider"),factory:b("$provide","factory"),service:b("$provide","service"),
+        value:b("$provide","value"),constant:b("$provide","constant","unshift"),filter:b("$filterProvider","register"),directive:b("$compileProvider","directive"),config:h,run:function(a){d.push(a);return this}};f&&h(f);return g})}})})(window);
+
+        /*
+         * $script.js v1.3
+         * https://github.com/ded/script.js
+         * Copyright: @ded & @fat - Dustin Diaz, Jacob Thornton 2011
+         * Follow our software http://twitter.com/dedfat
+         * License: MIT
+         */
+        (function(e,t,n){typeof module!="undefined"&&module.exports?module.exports=n():typeof define=="function"&&define.amd?define(n):t[e]=n()})("$script",this,function(){function v(e,t){for(var n=0,r=e.length;n<r;++n)if(!t(e[n]))return f;return 1}function m(e,t){v(e,function(e){return!t(e)})}function g(e,t,a){function d(e){return e.call?e():r[e]}function b(){if(!--p){r[h]=1,c&&c();for(var e in s)v(e.split("|"),d)&&!m(s[e],d)&&(s[e]=[])}}e=e[l]?e:[e];var f=t&&t.call,c=f?t:a,h=f?e.join(""):t,p=e.length;return setTimeout(function(){m(e,function(e){if(e===null)return b();if(u[e])return h&&(i[h]=1),u[e]==2&&b();u[e]=1,h&&(i[h]=1),y(!n.test(e)&&o?o+e+".js":e,b)})},0),g}function y(n,r){var i=e.createElement("script"),s=f;i.onload=i.onerror=i[d]=function(){if(i[h]&&!/^c|loade/.test(i[h])||s)return;i.onload=i[d]=null,s=1,u[n]=2,r()},i.async=1,i.src=n,t.insertBefore(i,t.firstChild)}var e=document,t=e.getElementsByTagName("head")[0],n=/^https?:\/\//,r={},i={},s={},o,u={},a="string",f=!1,l="push",c="DOMContentLoaded",h="readyState",p="addEventListener",d="onreadystatechange";return!e[h]&&e[p]&&(e[p](c,function b(){e.removeEventListener(c,b,f),e[h]="complete"},f),e[h]="loading"),g.get=y,g.order=function(e,t,n){(function r(i){i=e.shift(),e.length?g(i,r):g(i,t,n)})()},g.path=function(e){o=e},g.ready=function(e,t,n){e=e[l]?e:[e];var i=[];return!m(e,function(e){r[e]||i[l](e)})&&v(e,function(e){return r[e]})?t():!function(e){s[e]=s[e]||[],s[e][l](t),n&&n(i)}(e.join("|")),g},g.done=function(e){g([null],e)},g})
+
+        $script.path('/');
+        $script([
+            "lib/jquery/jquery-1.10.2.min.js",
+            "lib/angular/angular.min.js",
+            "lib/dateformat/dateformat.js"
+        ]);
+
+        // load all of the dependencies asynchronously.
+        $script([
+        'lib/angular/angular.js',
+        'js/app.js',
+        'js/services.js',
+        'js/controllers.js',
+        'js/filters.js',
+        'js/directives.js'
+        ], function() {
+        // when all is done, execute bootstrap angular application
+        angular.bootstrap(document, ['myApp']);
+        });
+    </script>
+
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/nexus-webapp/css/base.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div style="position:absolute; top:0px; left:0px; width:100px; height:100px; background-color:red;">HAI</div>
+    <header class="navbar navbar-inverse navbar-fixed-top" role="banner">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nx-navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="javascript:void(0)">{{title}}</a>
+        </div>
+        <nav class="collapse navbar-collapse nx-navbar-collapse" role="navigation">
+            <ul class="nav navbar-nav">
+                {{#each item in navbuttons}}
+                    <li>
+                        <a href="{{item.link}}">{{item.text}}</a>
+                    </li>
+                {{/each}}
+            </ul>
+        </nav>
+    </header>
+    {{outlet}}
+
+    <script src="/assets/html5shiv/js/html5shiv.js" type="text/javascript"></script>
+    <script src="/assets/dateformat/js/dateformat.js" type="text/javascript"></script>
+    <script src="/assets/jquery/js/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="/assets/handlebars/js/handlebars-1.0.0.js" type="text/javascript"></script>
+    <script src="/assets/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+
+    <script src="/assets/nexus-webapp/js/nexuscore.js" type="text/javascript"></script>
+    <script src="/assets/nexus-webapp/js/pageloader.js" type="text/javascript"></script>
+    <script src="/assets/nexus-webapp/js/main.js" type="text/javascript"></script>
+</body>
+</html>
