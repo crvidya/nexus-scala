@@ -20,7 +20,7 @@ import com.nexus.webserver.{WebServerResponse, WebServerRequest, TWebServerHandl
 import com.nexus.webapi.{TWebApiHandler, WebApiHandlerFactory}
 import com.nexus.data.json.JsonObject
 import io.netty.handler.codec.http.HttpResponseStatus
-import com.nexus.errorhandling.{ReportedException, ErrorHandler, ErrorReportCategory, ErrorReport}
+import com.nexus.errorhandling._
 
 /**
  * No description given
@@ -33,12 +33,14 @@ class WebServerHandlerAPI extends TWebServerHandler {
     var handler: TWebApiHandler = null
     try{
       handler = WebApiHandlerFactory.handleRequest(request, response)
+      if(handler == null) JsonError.HANDLER_NOT_FOUND.throwException()
       val data = handler.handle(request)
       val ret = new JsonObject().addError("none").add("data", data)
       response.sendHeaders(HttpResponseStatus.OK)
       response.sendData(ret)
       response.close()
     }catch{
+      case e: JsonErrorException => throw e
       case e: Exception => {
         response.sendHeaders(HttpResponseStatus.INTERNAL_SERVER_ERROR)
         response.sendError("Error while processing request")

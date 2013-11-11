@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013 TeamNexus
+ *
+ * TeamNexus Licenses this file to you under the MIT License (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *    http://opensource.org/licenses/mit-license.php
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License
+ */
+
 package com.nexus.data.couchdb
 
 import com.nexus.data.json.JsonObject
@@ -9,7 +25,10 @@ import com.nexus.data.json.JsonObject
  */
 trait TCouchDBSerializable {
 
-  private var _databaseType: String = this.getClass.getSimpleName
+  private var _databaseType: String = {
+    val ann = this.getClass.getAnnotation(classOf[DatabaseType])
+    if(ann != null) ann.value() else this.getClass.getSimpleName
+  }
   private var _databaseId: UID = null
   private var _databaseRevision: String = null
   private var _existsInDatabase: Boolean = false
@@ -22,7 +41,7 @@ trait TCouchDBSerializable {
     data.add("type", this._databaseType)
     this.writeToJsonForDB(data)
   }
-  private final def readDB(data: JsonObject){
+  final def readDB(data: JsonObject){
     if(this._databaseId == null) this._databaseId = new UID(data.get("_id").asString)
     this._databaseRevision = data.get("_rev").asString
     this.readFromJsonForDB(data)

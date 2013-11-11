@@ -16,29 +16,23 @@
 
 package com.nexus.authentication
 
-import com.nexus.data.couchdb.{DatabaseType, TCouchDBSerializable}
-import com.nexus.data.json.JsonObject
+import com.nexus.concurrent.WorkerPool
+import com.nexus.concurrent.tasks.CheckSCryptHashTask
 
 /**
  * No description given
  *
  * @author jk-5
  */
-@DatabaseType("user")
-case class User(private var username: String) extends TCouchDBSerializable {
+object SessionManager {
 
-  private var passwordHash: String = _
-
-  def writeToJsonForDB(data: JsonObject){
-    data.add("username", this.username)
-    data.add("passwordHash", this.passwordHash)
+  def getSession(user: User, password: String): Option[AuthSession] = {
+    val future = WorkerPool.submit(new CheckSCryptHashTask(password, user.getPasswordHash))
+    if(future.get()){
+      val session = new AuthSession(user.getID)
+      session.saveToDatabase()
+      return Some(session)
+    }
+    None
   }
-
-  def readFromJsonForDB(data: JsonObject){
-    this.username = data.get("username").asString
-    this.passwordHash = data.get("passwordHash").asString
-  }
-
-  @inline def getUsername = this.username
-  @inline def getPasswordHash = this.passwordHash
 }

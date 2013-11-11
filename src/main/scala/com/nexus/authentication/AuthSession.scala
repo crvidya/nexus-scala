@@ -16,11 +16,29 @@
 
 package com.nexus.authentication
 
+import com.nexus.data.couchdb.{DatabaseType, UID, TCouchDBSerializable}
+import com.nexus.data.json.JsonObject
+import java.util.Date
+import com.nexus.time.NexusTime
+
 /**
  * No description given
  *
  * @author jk-5
  */
-class AuthSession {
+@DatabaseType("session")
+class AuthSession(private var userID: UID) extends TCouchDBSerializable {
 
+  private var created = NexusTime.getCurrentDate
+
+  protected def writeToJsonForDB(data: JsonObject){
+    data.add("userID", this.userID.toString)
+    data.add("created", this.created.getTime)
+  }
+  protected def readFromJsonForDB(data: JsonObject){
+    this.userID = new UID(data.get("userID").asString)
+    this.created = new Date(data.get("created").asLong)
+  }
+
+  def toJson = new JsonObject().add("id", this.getID.toString).add("created", this.created.getTime)
 }

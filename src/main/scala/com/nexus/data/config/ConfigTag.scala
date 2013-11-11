@@ -71,12 +71,12 @@ class ConfigTag(var parent: ConfigTagParent, var name: String) extends ConfigTag
     else if (value != null && (value.equalsIgnoreCase("false") || value.equalsIgnoreCase("no"))) return false
     throw new NumberFormatException(this.qualifiedName + ".value=" + value)
   }
-  def getBooleanValue(defaultvalue: Boolean): Boolean = {
-    if (value == null) this.setBooleanValue(defaultvalue)
+  def getBooleanValue(default: Boolean): Boolean = {
+    if (value == null) this.setBooleanValue(default)
     try getBooleanValue
     catch {
       case nfe: NumberFormatException => {
-        setBooleanValue(defaultvalue)
+        setBooleanValue(default)
         return getBooleanValue
       }
     }

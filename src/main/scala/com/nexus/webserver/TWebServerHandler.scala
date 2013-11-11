@@ -28,6 +28,7 @@ import com.nexus.data.json.JsonObject
 import io.netty.util.CharsetUtil
 import com.nexus.Version
 import com.nexus.time.NexusTime
+import com.nexus.errorhandling.JsonErrorException
 
 /**
  * No description given
@@ -50,7 +51,15 @@ trait TWebServerHandler {
   def handleRequest(ctx: ChannelHandlerContext, req: FullHttpRequest){
     val request = new WebServerRequest(ctx, req)
     val response = new WebServerResponse(request)
-    this.handle(request, response)
+    try{
+      this.handle(request, response)
+    }catch{
+      case e: JsonErrorException => {
+        response.sendHeaders(e.error.getStatus)
+        response.sendData(e.error.toErrorJson)
+        response.close()
+      }
+    }
   }
   def handle(request: WebServerRequest, response: WebServerResponse){
     response.sendHeaders(HttpResponseStatus.NOT_FOUND)

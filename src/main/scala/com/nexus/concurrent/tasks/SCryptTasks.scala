@@ -14,31 +14,19 @@
  * under the License
  */
 
-package com.nexus.authentication
+package com.nexus.concurrent.tasks
 
-import com.nexus.data.couchdb.{DatabaseType, TCouchDBSerializable}
-import com.nexus.data.json.JsonObject
+import java.util.concurrent.Callable
+import com.lambdaworks.crypto.SCryptUtil
 
 /**
  * No description given
  *
  * @author jk-5
  */
-@DatabaseType("user")
-case class User(private var username: String) extends TCouchDBSerializable {
-
-  private var passwordHash: String = _
-
-  def writeToJsonForDB(data: JsonObject){
-    data.add("username", this.username)
-    data.add("passwordHash", this.passwordHash)
-  }
-
-  def readFromJsonForDB(data: JsonObject){
-    this.username = data.get("username").asString
-    this.passwordHash = data.get("passwordHash").asString
-  }
-
-  @inline def getUsername = this.username
-  @inline def getPasswordHash = this.passwordHash
+class CreateSCryptHashTask(private final val input: String, private final val cpuCost: Int = 16384, private final val memoryCost: Int = 8, private final val parallel: Int = 1) extends Callable[String] {
+  def call(): String = SCryptUtil.scrypt(this.input, this.cpuCost, this.memoryCost, this.parallel)
+}
+class CheckSCryptHashTask(private final val input: String, private final val hash: String) extends Callable[Boolean] {
+  def call(): Boolean = SCryptUtil.check(this.input, this.hash)
 }

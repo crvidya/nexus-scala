@@ -14,31 +14,21 @@
  * under the License
  */
 
-package com.nexus.authentication
+package com.nexus.data.couchdb;
 
-import com.nexus.data.couchdb.{DatabaseType, TCouchDBSerializable}
-import com.nexus.data.json.JsonObject
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * No description given
  *
  * @author jk-5
  */
-@DatabaseType("user")
-case class User(private var username: String) extends TCouchDBSerializable {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DatabaseType {
 
-  private var passwordHash: String = _
-
-  def writeToJsonForDB(data: JsonObject){
-    data.add("username", this.username)
-    data.add("passwordHash", this.passwordHash)
-  }
-
-  def readFromJsonForDB(data: JsonObject){
-    this.username = data.get("username").asString
-    this.passwordHash = data.get("passwordHash").asString
-  }
-
-  @inline def getUsername = this.username
-  @inline def getPasswordHash = this.passwordHash
+    public String value();
 }

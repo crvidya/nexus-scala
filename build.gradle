@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin:'java'
 apply plugin:'scala'
 apply plugin:'idea'
@@ -42,13 +44,14 @@ processResources{
 }
 
 dependencies{
-    compile 'org.scala-lang:scala-library:2.10.2'
-    compile 'io.netty:netty-all:4.0.12.Final'
-    compile 'com.ning:async-http-client:1.7.20'
-    compile 'org.ow2.asm:asm:5.0_BETA'
+    compile 'org.scala-lang:scala-library:2.10.2' //Scala library, because we're scala
+    compile 'io.netty:netty-all:4.0.12.Final' //High-efficiency fancy network library. I love netty
+    compile 'com.ning:async-http-client:1.7.20' //aSync http client, that uses netty 3 -_- maybe replace this in the future
+    compile 'org.ow2.asm:asm:5.0_BETA' //ASM for EventBus fancyness
     compile 'org.slf4j:slf4j-nop:1.7.5' //Because async-http-client ships the slf4j api that throws stupid warnings
     compile 'com.google.code.findbugs:jsr305:2.0.2' //Needed for guava
-    compile 'com.google.guava:guava:15.0'
+    compile 'com.google.guava:guava:15.0' //Guava. Common functions that makes my life easier
+    compile 'com.lambdaworks:scrypt:1.4.0' //sCrypt library. Security!
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.9.5'

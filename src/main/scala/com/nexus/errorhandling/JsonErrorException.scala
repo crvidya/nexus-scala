@@ -14,31 +14,13 @@
  * under the License
  */
 
-package com.nexus.authentication
-
-import com.nexus.data.couchdb.{DatabaseType, TCouchDBSerializable}
-import com.nexus.data.json.JsonObject
+package com.nexus.errorhandling
 
 /**
  * No description given
  *
  * @author jk-5
  */
-@DatabaseType("user")
-case class User(private var username: String) extends TCouchDBSerializable {
-
-  private var passwordHash: String = _
-
-  def writeToJsonForDB(data: JsonObject){
-    data.add("username", this.username)
-    data.add("passwordHash", this.passwordHash)
-  }
-
-  def readFromJsonForDB(data: JsonObject){
-    this.username = data.get("username").asString
-    this.passwordHash = data.get("passwordHash").asString
-  }
-
-  @inline def getUsername = this.username
-  @inline def getPasswordHash = this.passwordHash
+class JsonErrorException(final val error: JsonError) extends RuntimeException{
+  this.setStackTrace(new Array(0))
 }

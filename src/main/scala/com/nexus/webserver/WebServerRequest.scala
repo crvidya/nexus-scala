@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.{QueryStringDecoder, FullHttpRequest}
 import java.net.InetSocketAddress
 import com.nexus.util.Utils
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder
 
 /**
  * No description given
@@ -29,6 +30,7 @@ import com.nexus.util.Utils
 class WebServerRequest(private final val ctx: ChannelHandlerContext, private final val request: FullHttpRequest) {
 
   private final val queryStringDecoder = new QueryStringDecoder(this.request.getUri)
+  private final val postParameters = new HttpPostRequestDecoder(this.request)
   private final val params = this.queryStringDecoder.parameters()
 
   def getAddress = this.ctx.channel().remoteAddress().asInstanceOf[InetSocketAddress].getAddress
@@ -44,6 +46,7 @@ class WebServerRequest(private final val ctx: ChannelHandlerContext, private fin
     case _ => None
   }
   def getParameter(key:String): Option[String] = if(this.params.get(key) == null || this.params.get(key).size() == 0) None else Some(this.params.get(key).get(0))
+  def getPostData = this.postParameters
 
   def getContext = this.ctx
   def getHttpRequest = this.request

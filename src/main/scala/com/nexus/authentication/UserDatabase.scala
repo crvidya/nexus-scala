@@ -16,7 +16,7 @@
 
 package com.nexus.authentication
 
-import com.nexus.data.couchdb.{DatabaseType, TCouchDBSerializable}
+import com.nexus.data.couchdb.CouchDB
 import com.nexus.data.json.JsonObject
 
 /**
@@ -24,21 +24,16 @@ import com.nexus.data.json.JsonObject
  *
  * @author jk-5
  */
-@DatabaseType("user")
-case class User(private var username: String) extends TCouchDBSerializable {
+object UserDatabase {
 
-  private var passwordHash: String = _
-
-  def writeToJsonForDB(data: JsonObject){
-    data.add("username", this.username)
-    data.add("passwordHash", this.passwordHash)
+  def getUser(username: String): Option[User] = {
+    val data = CouchDB.getViewData("users", "byUsername").get()
+    val json = JsonObject.readFrom(data.getResponseBody).get("rows").asArray
+    val userData = json.getValues.map(_.asObject).find(_.get("key").asString == username).map(_.get("value").asObject)
+    if(userData.isDefined){
+      val u = new User(username)
+      u.readDB(userData.get)
+      Some(u)
+    } else None
   }
-
-  def readFromJsonForDB(data: JsonObject){
-    this.username = data.get("username").asString
-    this.passwordHash = data.get("passwordHash").asString
-  }
-
-  @inline def getUsername = this.username
-  @inline def getPasswordHash = this.passwordHash
 }
