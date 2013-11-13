@@ -14,26 +14,30 @@
  * under the License
  */
 
-package com.nexus.authentication
+package com.nexus.authentication.tfa
 
-import com.nexus.concurrent.WorkerPool
-import com.nexus.concurrent.tasks.CheckSCryptHashTask
+import scala.collection.immutable
+import com.nexus.authentication.tfa.protocols.totp.TOTPProtocol
+import com.nexus.data.json.JsonObject
 
 /**
  * No description given
  *
  * @author jk-5
  */
-object SessionManager {
+object TFAProtocolManager {
+  private val protocols = immutable.List[TFAProtocol]{TOTPProtocol}
 
-  @inline def checkPassword(user: User, password: String) = WorkerPool.submit(new CheckSCryptHashTask(password, user.getPasswordHash)).get()
+  def getProtocol(name: String) = this.protocols.find(_.getName == name)
 
-  def getSession(user: User, password: String): Option[AuthSession] = {
-    if(this.checkPassword(user, password)){
-      val session = new AuthSession(user.getID)
-      session.saveToDatabase()
-      return Some(session)
+  def read(json: JsonObject): TFAStorage = {
+    val ret = new TFAStorage()
+    val protocol = this.getProtocol(json.get("protocol").asString)
+    if(protocol.isEmpty) ret.setEnabled(enabled = false)
+    else{
+      ret.setProtocol(protocol.get)
+      ret.readFromJson(json)
     }
-    None
+    ret
   }
 }

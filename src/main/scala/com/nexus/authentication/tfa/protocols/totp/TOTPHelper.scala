@@ -14,13 +14,14 @@
  * under the License
  */
 
-package com.nexus.authentication.tfa
+package com.nexus.authentication.tfa.protocols.totp
 
 import com.nexus.data.codec.Base32
 import java.util
 import java.util.Random
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import com.nexus.time.NexusTime
 
 /**
  * No description given
@@ -39,6 +40,8 @@ object TOTPHelper {
 
   def getQRBarcodeURL(user: String, host: String, secret: String): String =
     "https://www.google.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=otpauth://totp/%s@%s%%3Fsecret%%3D%s".format(user, host, secret)
+
+  def checkCode(secret: String, code: Long): Boolean = new TOTPHelper().check_code(secret, code, NexusTime.getCurrentTime)
 
   private def verify_code(key: Array[Byte], t: Long): Int = {
     val data: Array[Byte] = new Array[Byte](8)

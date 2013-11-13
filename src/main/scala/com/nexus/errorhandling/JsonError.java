@@ -30,8 +30,11 @@ public enum JsonError {
     HANDLER_NOT_FOUND(3, HttpResponseStatus.NOT_FOUND),
     LOGIN_USERNAME_UNDEFINED(10),
     LOGIN_PASSWORD_UNDEFINED(11),
-    LOGIN_USERNAME_WRONG(12),
-    LOGIN_PASSWORD_WRONG(13);
+    LOGIN_TFAKEY_UNDEFINED(12),
+    LOGIN_USERNAME_WRONG(15),
+    LOGIN_PASSWORD_WRONG(16),
+    LOGIN_TFAKEY_WRONG(17),
+    LOGIN_TFAKEY_NONUMBER(18);
 
     private final int errorCode;
     private final JsonObject json;

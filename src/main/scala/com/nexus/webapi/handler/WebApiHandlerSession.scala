@@ -37,8 +37,22 @@ class WebApiHandlerSession extends TWebApiHandler {
     if(request.getMethod == HttpMethod.POST){
       val usernameField = request.getPostData.getBodyHttpData("username")
       val passwordField = request.getPostData.getBodyHttpData("password")
+      val tfaKeyField = request.getPostData.getBodyHttpData("tfaKey")
+      var tfaProvided = false
+      var tfaKey: Option[Long] = None
       if(usernameField == null) JsonError.LOGIN_USERNAME_UNDEFINED.throwException()
       if(passwordField == null) JsonError.LOGIN_PASSWORD_UNDEFINED.throwException()
+      if(tfaKeyField != null && tfaKeyField.getHttpDataType == InterfaceHttpData.HttpDataType.Attribute){
+        tfaProvided = true
+        val value = tfaKeyField.asInstanceOf[Attribute].getValue
+        var parsed: Long = 0L
+        try{
+          parsed = value.toLong
+        }catch{
+          case e: NumberFormatException => JsonError.LOGIN_TFAKEY_NONUMBER.throwException()
+        }
+        tfaKey = Some(parsed)
+      }
       var username: Option[String] = None
       var password: Option[String] = None
       if(usernameField.getHttpDataType == InterfaceHttpData.HttpDataType.Attribute){
@@ -52,6 +66,12 @@ class WebApiHandlerSession extends TWebApiHandler {
 
       val user = UserDatabase.getUser(username.get)
       if(user.isEmpty) JsonError.LOGIN_USERNAME_WRONG.throwException()
+      if(!SessionManager.checkPassword(user.get, password.get)) JsonError.LOGIN_PASSWORD_WRONG.throwException()
+      if(user.get.getTfaData.isEnabled){
+        if(!tfaProvided) JsonError.LOGIN_TFAKEY_UNDEFINED.throwException()
+        val valid = user.get.getTfaData.getProtocol.checkKey(user.get, tfaKey.get)
+        if(!valid) JsonError.LOGIN_TFAKEY_WRONG.throwException()
+      }
       val session = SessionManager.getSession(user.get, password.get)
       if(session.isEmpty) JsonError.LOGIN_PASSWORD_WRONG.throwException()
       return this.RESPONSE_OBJECT.set("session", session.get.toJson)

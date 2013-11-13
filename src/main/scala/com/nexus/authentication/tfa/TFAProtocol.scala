@@ -14,26 +14,17 @@
  * under the License
  */
 
-package com.nexus.authentication
+package com.nexus.authentication.tfa
 
-import com.nexus.concurrent.WorkerPool
-import com.nexus.concurrent.tasks.CheckSCryptHashTask
+import com.nexus.authentication.User
 
 /**
  * No description given
  *
  * @author jk-5
  */
-object SessionManager {
-
-  @inline def checkPassword(user: User, password: String) = WorkerPool.submit(new CheckSCryptHashTask(password, user.getPasswordHash)).get()
-
-  def getSession(user: User, password: String): Option[AuthSession] = {
-    if(this.checkPassword(user, password)){
-      val session = new AuthSession(user.getID)
-      session.saveToDatabase()
-      return Some(session)
-    }
-    None
-  }
+trait TFAProtocol {
+  def createSecret(user: User): String
+  def checkKey(user: User, code: Long): Boolean
+  def getName: String
 }

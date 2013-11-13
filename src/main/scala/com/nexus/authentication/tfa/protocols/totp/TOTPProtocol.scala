@@ -14,26 +14,19 @@
  * under the License
  */
 
-package com.nexus.authentication
+package com.nexus.authentication.tfa.protocols.totp
 
-import com.nexus.concurrent.WorkerPool
-import com.nexus.concurrent.tasks.CheckSCryptHashTask
+import com.nexus.authentication.tfa.TFAProtocol
+import com.nexus.authentication.User
 
 /**
  * No description given
  *
  * @author jk-5
  */
-object SessionManager {
+object TOTPProtocol extends TFAProtocol{
 
-  @inline def checkPassword(user: User, password: String) = WorkerPool.submit(new CheckSCryptHashTask(password, user.getPasswordHash)).get()
-
-  def getSession(user: User, password: String): Option[AuthSession] = {
-    if(this.checkPassword(user, password)){
-      val session = new AuthSession(user.getID)
-      session.saveToDatabase()
-      return Some(session)
-    }
-    None
-  }
+  def createSecret(user: User): String = TOTPHelper.generateSecretKey
+  def checkKey(user: User, code: Long): Boolean = TOTPHelper.checkCode(user.getTfaData.getSecret, code)
+  def getName = "totp"
 }
