@@ -36,16 +36,16 @@ object WebServer extends TLoader {
 class WebServer(private final val port: Int) extends Thread {
   this.setName("Nexus WebServer main thread")
 
-	override def run() {
-		val boss = new NioEventLoopGroup
-		val worker = new NioEventLoopGroup
-		try{
+  override def run() {
+    val boss = new NioEventLoopGroup
+    val worker = new NioEventLoopGroup
+    try{
       val srv = new ServerBootstrap
       srv.group(boss, worker).channel(classOf[NioServerSocketChannel]).childHandler(Pipeline)
       val ch = srv.bind(this.port).sync().channel()
       NexusLog.info("Webserver is running on port " + this.port)
       ch.closeFuture().sync()
-		}catch{
+    }catch{
       case e: BindException => NexusLog.severe("Webserver was not able to listen on port " + this.port)
     }finally{
       boss.shutdownGracefully()

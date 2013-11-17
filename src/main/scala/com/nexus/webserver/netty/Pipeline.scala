@@ -48,6 +48,7 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
 
     pipe.addLast("httpDecoder", new HttpRequestDecoder)                 //Downstream
     pipe.addLast("httpEncoder", new HttpResponseEncoder)                //Upstream
+    //pipe.addLast("gzip", new HttpContentCompressor(6));                 //Upstream
     pipe.addLast("aggregator", new HttpObjectAggregator(1048576))       //Downstream
     pipe.addLast("jsonDecoder", JsonObjectDecoder)                      //Downstream
     pipe.addLast("jsonEncoder", JsonObjectEncoder)                      //Upstream
