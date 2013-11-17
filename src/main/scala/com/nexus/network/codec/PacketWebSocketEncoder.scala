@@ -17,21 +17,27 @@
 package com.nexus.network.codec
 
 import io.netty.handler.codec.MessageToMessageEncoder
+import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import java.util
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
+import com.nexus.network.packet.Packet
 import com.nexus.data.json.JsonObject
-import io.netty.channel.ChannelHandler.Sharable
 
 /**
- * Encodes an JsonObject into an TextWebSocketFrame
+ * Encodes an Packet into an JsonObject
  *
  * @author jk-5
  */
 @Sharable
-object JsonObjectEncoder extends MessageToMessageEncoder[JsonObject] {
+object PacketWebSocketEncoder extends MessageToMessageEncoder[Packet] {
 
-  override def encode(ctx: ChannelHandlerContext, data: JsonObject, out: util.List[AnyRef]){
-    out.add(new TextWebSocketFrame(data.stringify))
+  override def encode(ctx: ChannelHandlerContext, packet: Packet, out: util.List[AnyRef]){
+    val data = new JsonObject
+    packet.write(data)
+    val packetData = new JsonObject
+    packetData.add("id", packet.getPacketID)
+    if(packet.hasData) packetData.add("data", data)
+    out.add(new TextWebSocketFrame(packetData.stringify))
   }
 }

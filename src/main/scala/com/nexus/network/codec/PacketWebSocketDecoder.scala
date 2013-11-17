@@ -16,26 +16,39 @@
 
 package com.nexus.network.codec
 
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import io.netty.handler.codec.MessageToMessageDecoder
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import io.netty.channel.ChannelHandlerContext
 import java.util
 import com.nexus.data.json.JsonObject
+import com.nexus.network.PacketManager
 import io.netty.channel.ChannelHandler.Sharable
 
 /**
- * Tries to decode TextWebSocketFrames into JsonObjects. Returns the TextWebSocketFrame if no valid json was found
+ * Decodes an JsonObject into an Packet
  *
  * @author jk-5
  */
 @Sharable
-object JsonObjectDecoder extends MessageToMessageDecoder[TextWebSocketFrame] {
+object PacketWebSocketDecoder extends MessageToMessageDecoder[TextWebSocketFrame] {
 
   override def decode(ctx: ChannelHandlerContext, msg: TextWebSocketFrame, out: util.List[AnyRef]){
     try{
-      val jsonData = JsonObject.readFrom(msg.text())
-      jsonData.set("decoder", "websocket")
-      out.add(jsonData)
+      val data = JsonObject.readFrom(msg.text())
+      if(data == null || data.get("id") == null){
+        out.add(msg)
+        return
+      }
+      val packet = PacketManager.getPacketFromID(data.get("id").asInt)
+      if(packet == null){
+        out.add(msg)
+        return
+      }
+      if(data.get("data") != null){
+        packet.read(data.get("data").asObject)
+      }
+      packet.setDecoder("websocket")
+      out.add(packet)
     }catch{
       case e: Exception => out.add(msg)
     }

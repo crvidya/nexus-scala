@@ -21,7 +21,7 @@ import io.netty.channel.ChannelInitializer
 import io.netty.handler.ssl.SslHandler
 import io.netty.handler.codec.http._
 import com.nexus.webserver.SslContextProvider
-import com.nexus.network.codec.{PacketJsonDecoder, JsonObjectDecoder, JsonObjectEncoder, PacketJsonEncoder}
+import com.nexus.network.codec.{PacketWebSocketDecoder, PacketWebSocketEncoder}
 import com.nexus.network.PacketHandler
 import io.netty.handler.stream.ChunkedWriteHandler
 import io.netty.handler.timeout.IdleStateHandler
@@ -50,10 +50,8 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
     pipe.addLast("httpEncoder", new HttpResponseEncoder)                //Upstream
     //pipe.addLast("gzip", new HttpContentCompressor(6));                 //Upstream
     pipe.addLast("aggregator", new HttpObjectAggregator(1048576))       //Downstream
-    pipe.addLast("jsonDecoder", JsonObjectDecoder)                      //Downstream
-    pipe.addLast("jsonEncoder", JsonObjectEncoder)                      //Upstream
-    pipe.addLast("packetJsonDecoder", PacketJsonDecoder)                //Downstream
-    pipe.addLast("packetJsonEncoder", PacketJsonEncoder)                //Upstream
+    pipe.addLast("packetWetSocketDecoder", PacketWebSocketDecoder)      //Downstream
+    pipe.addLast("packetWetSocketEncoder", PacketWebSocketEncoder)      //Upstream
     pipe.addLast("chunkedWriter", new ChunkedWriteHandler())            //Upstream
     pipe.addLast("webserverHandler", webserverHandler)                  //Downstream
     pipe.addLast("idleStateHandler", new IdleStateHandler(10, 30, 60))  //Upstream & Downstream
