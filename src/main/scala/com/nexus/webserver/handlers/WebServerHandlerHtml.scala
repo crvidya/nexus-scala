@@ -16,7 +16,7 @@
 
 package com.nexus.webserver.handlers
 
-import com.nexus.webserver.{SslContextProvider, TWebServerHandler}
+import com.nexus.webserver.{WebServerUtils, SslContextProvider, TWebServerHandler}
 import io.netty.channel._
 import io.netty.handler.codec.http._
 import com.nexus.util.Utils
@@ -37,13 +37,13 @@ class WebServerHandlerHtml extends TWebServerHandler {
 
   override def handleRequest(ctx: ChannelHandlerContext, req: FullHttpRequest){
     if(req.getMethod != HttpMethod.GET){
-      this.sendError(ctx, HttpResponseStatus.BAD_REQUEST)
+      WebServerUtils.sendError(ctx, HttpResponseStatus.BAD_REQUEST)
       return
     }
     val uri = req.getUri.split("\\?", 2)(0)
     val path = htdocsLocation + Utils.sanitizeURI(uri)
     if(path == null){
-      this.sendError(ctx, HttpResponseStatus.FORBIDDEN)
+      WebServerUtils.sendError(ctx, HttpResponseStatus.FORBIDDEN)
       return
     }
     var file = new File(path)
@@ -52,27 +52,27 @@ class WebServerHandlerHtml extends TWebServerHandler {
       if(index.exists() && index.isFile) file = index
     }
     if(file.isHidden || !file.exists){
-      this.sendError(ctx, HttpResponseStatus.NOT_FOUND)
+      WebServerUtils.sendError(ctx, HttpResponseStatus.NOT_FOUND)
       return
     }
     if(file.isDirectory){
       if(uri.endsWith("/")) {
         //this.sendFileList(ctx, file) //TODO: file list?
-      }else this.sendRedirect(ctx, uri + "/")
+      }else WebServerUtils.sendRedirect(ctx, uri + "/")
       return
     }
     if(!file.isFile){
-      this.sendError(ctx, HttpResponseStatus.FORBIDDEN)
+      WebServerUtils.sendError(ctx, HttpResponseStatus.FORBIDDEN)
       return
     }
     val ifModifiedSince = req.headers().get(HttpHeaders.Names.IF_MODIFIED_SINCE)
     if(ifModifiedSince != null && !ifModifiedSince.isEmpty){
-      val dateFormatter = new SimpleDateFormat(this.HTTP_DATE_FORMAT, Locale.US)
+      val dateFormatter = new SimpleDateFormat(WebServerUtils.HTTP_DATE_FORMAT, Locale.US)
       val ifModifiedSinceDate = dateFormatter.parse(ifModifiedSince)
       val ifModifiedSinceDateSeconds = ifModifiedSinceDate.getTime / 1000
       val fileLastModifiedSeconds = file.lastModified() / 1000
       if(ifModifiedSinceDateSeconds == fileLastModifiedSeconds){
-        this.sendNotModified(ctx)
+        WebServerUtils.sendNotModified(ctx)
         return
       }
     }
@@ -81,17 +81,16 @@ class WebServerHandlerHtml extends TWebServerHandler {
       raf = new RandomAccessFile(file, "r")
     }catch{
       case e: FileNotFoundException => {
-        this.sendError(ctx, HttpResponseStatus.NOT_FOUND)
+        WebServerUtils.sendError(ctx, HttpResponseStatus.NOT_FOUND)
         return
       }
     }
     val fileLength = raf.length()
     val response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK)
 
-    this.setContentLength(response, fileLength)
-    this.setContentType(response, file)
-    this.setDateAndCacheHeaders(response, file)
-    this.setDefaultHeaders(response)
+    WebServerUtils.setContentLength(response, fileLength)
+    WebServerUtils.setContentType(response, file)
+    WebServerUtils.setDateAndCacheHeaders(response, file)
     if(HttpHeaders.isKeepAlive(req)) response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE)
     ctx.write(response)
 

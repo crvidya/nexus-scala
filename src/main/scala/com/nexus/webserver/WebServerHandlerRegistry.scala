@@ -27,7 +27,7 @@ import scala.collection.mutable
 object WebServerHandlerRegistry {
 
   private final val handlers = mutable.LinkedHashMap[String, TWebServerHandler](
-    "/websocket/" -> new WebServerHandlerWebsocket("/websocket"),
+    //"/websocket/" -> new WebServerHandlerWebsocket("/websocket"),
     "/api/" -> new WebServerHandlerAPI,
     "/(.*)" -> new WebServerHandlerHtml
   )

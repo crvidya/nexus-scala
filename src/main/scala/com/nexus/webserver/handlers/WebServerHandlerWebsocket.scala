@@ -17,24 +17,26 @@
 package com.nexus.webserver.handlers
 
 import com.nexus.webserver.{SslContextProvider, TWebServerHandler}
-import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.{SimpleChannelInboundHandler, ChannelHandlerContext}
 import io.netty.handler.codec.http.{HttpHeaders, FullHttpRequest}
 import io.netty.handler.codec.http.websocketx._
+import com.nexus.webserver.netty.{WebSocketHandler, RoutedHandler}
 
 /**
  * No description given
  *
  * @author jk-5
  */
-class WebServerHandlerWebsocket(private final val websocketPath: String) extends TWebServerHandler {
+class WebServerHandlerWebsocket extends SimpleChannelInboundHandler[FullHttpRequest] with RoutedHandler {
 
-  override def handleRequest(ctx: ChannelHandlerContext, req: FullHttpRequest) {
-    val factory = new WebSocketServerHandshakerFactory("%s://".format(if(SslContextProvider.isValid) "wss" else "ws") + req.headers().get(HttpHeaders.Names.HOST + this.websocketPath), null, false)
-    val handshaker = factory.newHandshaker(req)
+  def channelRead0(ctx: ChannelHandlerContext, msg: FullHttpRequest) {
+    println(this.getURLData.getURL)
+    val factory = new WebSocketServerHandshakerFactory("%s://".format(if(SslContextProvider.isValid) "wss" else "ws") + msg.headers().get(HttpHeaders.Names.HOST) + "/websocket", null, false)
+    val handshaker = factory.newHandshaker(msg)
     if(handshaker == null) WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel())
     else{
-      handshaker.handshake(ctx.channel(), req)
-      this.getNettyHandler.getWebSocketHandler.setHandshaker(handshaker)
+      handshaker.handshake(ctx.channel(), msg)
+      ctx.pipeline().get("websocketHandler").asInstanceOf[WebSocketHandler].setHandshaker(handshaker)
     }
   }
 }

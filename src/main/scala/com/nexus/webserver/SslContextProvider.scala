@@ -52,6 +52,7 @@ object SslContextProvider extends TLoader {
       }catch{case e: Exception =>}
     }catch{case e: Exception =>}
 
+    this.valid = false
     if(this.valid) NexusLog.info("Valid SSL certificate was found")
     else NexusLog.info("No valid SSL certificate was found")
   }

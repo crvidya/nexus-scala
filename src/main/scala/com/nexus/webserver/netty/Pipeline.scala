@@ -25,6 +25,9 @@ import com.nexus.network.codec.{PacketWebSocketDecoder, PacketWebSocketEncoder}
 import com.nexus.network.PacketHandler
 import io.netty.handler.stream.ChunkedWriteHandler
 import io.netty.handler.timeout.IdleStateHandler
+import com.nexus.util.MultiplexingURLResolver
+import com.nexus.webserver.handlers.{WebServerHandlerTest, WebServerHandlerWebsocket}
+import io.netty.handler.logging.{LogLevel, LoggingHandler}
 
 /**
  * TODO: Enter description
@@ -32,6 +35,10 @@ import io.netty.handler.timeout.IdleStateHandler
  * @author jk-5
  */
 object Pipeline extends ChannelInitializer[SocketChannel] {
+
+  private val webserverMultiplexer = new MultiplexingURLResolver
+  this.webserverMultiplexer.addURLPattern("/websocket", classOf[WebServerHandlerWebsocket])
+  this.webserverMultiplexer.addURLPattern("/test", classOf[WebServerHandlerTest])
 
   override def initChannel(channel: SocketChannel){
     val pipe = channel.pipeline()
@@ -43,19 +50,23 @@ object Pipeline extends ChannelInitializer[SocketChannel] {
     }
 
     val websocketHandler = new WebSocketHandler
-    val webserverHandler = new WebServerHandler
-    webserverHandler.setWebSocketHandler(websocketHandler)
+    //val webserverHandler = new WebServerHandler
+    //webserverHandler.setWebSocketHandler(websocketHandler)
 
     pipe.addLast("httpDecoder", new HttpRequestDecoder)                 //Downstream
     pipe.addLast("httpEncoder", new HttpResponseEncoder)                //Upstream
     //pipe.addLast("gzip", new HttpContentCompressor(6));                 //Upstream
+    pipe.addLast("httpHeaderAppender", HttpHeaderAppender);             //Upstream
     pipe.addLast("aggregator", new HttpObjectAggregator(1048576))       //Downstream
+    pipe.addLast("chunkedWriter", new ChunkedWriteHandler())            //Upstream
+    //pipe.addLast("webserverHandler", webserverHandler)                  //Downstream
+    pipe.addLast("webserverRouter", new RouterHandler(this.webserverMultiplexer, "routedHandler"))               //Downstream
     pipe.addLast("packetWetSocketDecoder", PacketWebSocketDecoder)      //Downstream
     pipe.addLast("packetWetSocketEncoder", PacketWebSocketEncoder)      //Upstream
-    pipe.addLast("chunkedWriter", new ChunkedWriteHandler())            //Upstream
-    pipe.addLast("webserverHandler", webserverHandler)                  //Downstream
+    pipe.addLast("routedHandler", NotFoundHandler)                      //Downstream
     pipe.addLast("idleStateHandler", new IdleStateHandler(10, 30, 60))  //Upstream & Downstream
     pipe.addLast("websocketHandler", websocketHandler)                  //Downstream
     pipe.addLast("packetHandler", PacketHandler)                        //Downstream
+    pipe.addLast("notFoundHandler", NotFoundHandler)                    //Downstream
   }
 }
